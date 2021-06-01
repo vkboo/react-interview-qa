@@ -218,9 +218,24 @@ export default ThemedButton;
 ```
 #### 10. 怎么使用Context开发组件？
 （同上题，考察React Context API的基本用法）
+
 #### 11. 为什么React并不推荐我们优先考虑使用Context?
+1. 题目比较老了，因为在16.x的版本中，Context API始终是作为一个beta性质而存在，所以不推荐使用
+2. React中，最简单、影响渲染范围最小的是state & props，如果能用这两者解决的问题，没必要使用Context
+3. Context如果涉及渲染的组件较多，那么很可能产生对渲染性能的问题，而社区的库，如`React-Redux``Mobx`等，则会在库内部去做性能优化
+
 #### 12. 除了实例的属性可以获取Context外哪些地方还能直接获取Context呢?
+还有的方式有(上面的代码都有演示，这里就不再贴代码了)：
+1. Context.Consumer组件
+2. hooks: useContext
+
 #### 13. childContextTypes是什么？它有什么用？
+（过时的api，无需关注）
+
 #### 14. contextType是什么？它有什么用？
+`contextType`是React class组件的静态属性，将Context赋给这个静态属性后，再用组件的实例`.context`即可获取相应Context的值（上面有代码展示）。
+
 #### 15. Consumer向上找不到Provider的时候怎么办？
+找不到就取`React.createContext(initialValue)`中的默认值`initialValue`
 #### 16. 有使用过Consumer吗？
+用过。上面有代码。具体再补充一点，如果组件中需要使用多个Context的使用，需要使用多个`<Context.Consumer>`组件的嵌套，此种情况下，`useContext`肯定是更好的选择。
