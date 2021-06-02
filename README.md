@@ -244,13 +244,99 @@ React16: >=IE11
 #### 19. 说说你对windowing的了解
 在涉及到超长列表的场景时，如果不进行分页，一次性塞入大量的DOM，会对性能造型影响。这时候，就要用上windowing即“虚拟列表”技术，它的原理是随着用户的滚动，只渲染部分（一般是用户可见的那一部分）DOM，以此来减少性能消耗。在React中，可以使用`react-window`` `库进行实现。
 #### 20. 举例说明React的插槽有哪些运用场景？
-应用中全局的弹框，从逻辑上讲需要不与业务组件嵌套，一般来说还要与应用的根组件平级的；
+一个 portal 的典型用例是当父组件有 overflow: hidden 或 z-index 样式时，但你需要子组件能够在视觉上“跳出”其容器。例如，对话框、悬浮卡以及提示框.
 #### 21. 你有用过React的插槽（Portals）吗？怎么用？
+用过。核心的api是`ReactDOM.createPortal(reactNode, container)`,第一个参数是可渲染的react元素，第二个参数是DOM节点，返回一个新的react元素，在render函数的return中调用方法后，真实的DOM回渲染到指定的DOM Container下，但是从React组件树来看，他是没有变化的示例代码如下：
+
+注意: `ReactDOM.createPortal`看起来是往指定的DOM塞入react元素，但是其返回值必须在render函数或者函数式组件中真正的`return`了之后，才会渲染，这一点没有脱离React渲染组件的本质。
+```jsx
+import React from 'react';
+import ReactDOM from 'react-dom';
+export default class PortalsDemo extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            visible: false,
+        };
+    }
+
+    handleToggle = () => {
+        this.setState(prevState => ({
+            visible: !prevState.visible,
+        }));
+    }
+
+    render() {
+        const { visible } = this.state;
+        return (
+            <div>
+                <button onClick={this.handleToggle}>Toggle</button>
+                <Modal visible={visible}>
+                    <Child />
+                </Modal>
+            </div>
+        );
+    }
+}
+
+
+
+class Modal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.el = document.createElement('div');
+    }
+
+    componentDidMount() {
+        document.body.appendChild(this.el);
+    }
+
+
+    componentWillUnmount() {
+        document.body.removeChild(this.el);
+    }
+
+    render() {
+        const { visible } = this.props;
+        return visible
+            ? ReactDOM.createPortal(
+                this.props.children,
+                this.el
+            )
+            : null;
+    }
+}
+
+
+function Child() {
+    // 这个按钮的点击事件会冒泡到父元素
+    // 因为这里没有定义 'onClick' 属性
+    return (
+        <div className="modal">
+            弹框内容
+        </div>
+    );
+}
+
+```
 #### 22. React的严格模式有什么好处？
+通过`<React.strictMode>`内置组件包装，即开启了React的严格模式，内部组件的代码需遵循一定的规则：
+* 识别不安全的生命周期
+* 关于使用过时字符串 ref API 的警告
+* 关于使用废弃的 findDOMNode 方法的警告
+* 检测意外的副作用
+* 检测过时的 context API
 #### 23. React如果进行代码拆分？拆分的原则是什么？
+1. 首屏就要展示的组件不拆分
+2. 根据路由进行拆分
 #### 24. React组件的构造函数有什么用？
+* 对类中函数的`this`进行绑定
+* 定义初始的`state`的值
+* 定义实例变量，如`ref`
 #### 25. React组件的构造函数是必须的吗？
+不是。根据ES6的语法，不写如构造函数，默认也会载入构造函数里面只有一句代码`super(this)`用以调用父类的构造函数，用以让当前类得到`this`对象
 #### 26. React中在哪捕获错误？
+
 #### 27. React怎么引入svg的文件？
 #### 28. 说说你对Relay的理解
 #### 29. 在React中你有经常使用常量吗？
