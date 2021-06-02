@@ -19,7 +19,7 @@ React的渲染在`render`函数中进行，有以下几种方式会触发`render
 5. 父组件更新，会导致所有子组件的render方法执行
 需要注意的是，render函数的执行并不一定会导致DOM的重新渲染，React库内部首先会对新旧的VNode进行DOM Diff，然后以最小的代价去更新DOM。虽然diff算法很快，但是当应用大了之后，也可能会导致性能问题，所以就有一下的性能优化点，来组织不必要的`render`函数执行。
 1. 针对class组件，使用`React.PureComponent`
-2. 针对函数式组件，使用`React.Memo`
+2. 针对函数式组件，使用`React.memo`
 3. 合理的使用`shouldComponentUpdate`函数
 4. 父组件对需要传递的子组件的props，合理使用`useCallback`的hook
 5. 合理的拆分组件：组件粒度更细，避免大组件的渲染
