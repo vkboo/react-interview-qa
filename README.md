@@ -1,7 +1,6 @@
 # React 328道最全面试题 & 个人作答
 
 > [React 328道最全面试题](https://juejin.cn/post/6844903892853981198)
-
 ### React
 #### 1. 什么时候使用状态管理器？
 1. 从组件上考虑：状态需要共享到多个组件，任何组件都可以拿到并响应共享状态中的数据，任何组件也都可以修改共享状态中的数据；
@@ -11,10 +10,19 @@
 js是可不加分号的语言，所以在没有`()`的情况下，return后直接换行，会认为return了undefined，加上了括号，就不存在这种问题；不加的话，切记不能换行
 #### 3. componentWillUpdate可以直接修改state的值吗？
 不能。`componentWillUpdate`发生在`state`或`props`改变的情况下，在`shouldComponentUpdate`返回`true`且在`render`前执行，如果在`componentWillUpdate`中进行了`setState`或者`Redux`中的`dispatch(action)`操作，会导致`Maximum update depth exceeded`错误。
-#### **4. 说说你对React的渲染原理的理解
-React的数据源是两个部分：`state`和`props`；`state`的改变且当前组件的`JSX`引用了这个state，会引起当前组件render函数的渲染，props的改变，不管子组件的JSX中有没有挂载这个prop，都会触发子组件的render函数执行；render函数的执行，不代表会进行DOM的渲染，React内部的Fiber算法，会对新旧的虚拟DOM进行比较，如果不一致，才会进行新DOM的渲染。
-#### 5. 什么是渲染劫持
-一般通过hoc函数实现，重新目标组件的props state render函数，实现不限于组件渲染、条件渲染等功能；以下实现一个最简单的渲染劫持demo
+#### 4. 说说你对React的渲染原理的理解
+React的渲染在`render`函数中进行，有以下几种方式会触发`render`
+1. 初始渲染
+2. `this.setState`方法，参数不能为`null`,及时`this.setState({})`,或者`setState`一个相同的值，也会导致render函数的执行
+3. props的改变(采用浅比较)
+4. `this.forceUpdate`,render函数中如果依赖了非`state`和`props`的其它变量，就需要用这个方式强制`render`函数执行
+5. 父组件更新，会导致所有子组件的render方法执行
+需要注意的是，render函数的执行并不一定会导致DOM的重新渲染，React库内部首先会对新旧的VNode进行DOM Diff，然后以最小的代价去更新DOM。虽然diff算法很快，但是当应用大了之后，也可能会导致性能问题，所以就有一下的性能优化点，来组织不必要的`render`函数执行。
+1. 针对class组件，使用`React.PureComponent`
+2. 针对函数式组件，使用`React.Memo`
+3. 合理的使用`shouldComponentUpdate`函数
+4. 父组件对需要传递的子组件的props，合理使用`useCallback`的hook
+5. 合理的拆分组件：组件粒度更细，避免大组件的渲染
 ```jsx
 import React from 'react';
 export default class Child extends React.Component {
@@ -328,9 +336,18 @@ function Child() {
 * 关于使用废弃的 findDOMNode 方法的警告
 * 检测意外的副作用
 * 检测过时的 context API
+使用了严格模式的好处就是在使用过时的api和不安全的方法时，能够获得警告，避免使用上面这些，使得代码更健壮；
 #### 23. React如果进行代码拆分？拆分的原则是什么？
-1. 首屏就要展示的组件不拆分
-2. 根据路由进行拆分
+* pages：各路由级的页面文件，各子文件下又有当前页使用、复用度不高的业务组件
+* components: 公共组件/公共的HOC
+* layout: 公用的模块级组件
+* apis: ajax以及接口的封装
+* models/store： Mobx/Redux关于数据管理的封装
+* utils：工具方法的封装
+* config: 配置文件，工程中用到的常量配置 
+* assets: 公共的静态资源
+* styles: 公共的样式文件
+
 #### 24. React组件的构造函数有什么用？
 * 调用父类（即`React.Component`）的构造函数，内部`super(props)`，使当前类的`this`关键字可用（关于为什么要`super(props)`可以看[这里](https://overreacted.io/zh-hans/why-do-we-write-super-props/)）
 * 对类中函数的`this`进行绑定
