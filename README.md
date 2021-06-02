@@ -338,7 +338,49 @@ function Child() {
 #### 25. React组件的构造函数是必须的吗？
 不是。根据ES6的语法，不写如构造函数，默认也会载入构造函数里面只有一句代码`super(this)`用以调用父类的构造函数，用以让当前类得到`this`对象
 #### 26. React中在哪捕获错误？
+React可以使用特定的类组件包裹目标组件，进行错误边界的处理。错误边界组件需要声明静态方法`getDerivedErrorFromError(error)`和实例方法`componentDidCatch(error, errorInfo)`对子组件的错误进行捕获，在`render`方法中，可以自定义降级UI的渲染显示；示例代码如下;
+```jsx
+// 定义错误边界
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    // 更新 state 使下一次渲染能够显示降级后的 UI
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    // 你同样可以将错误日志上报给服务器
+    logErrorToMyService(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // 你可以自定义降级后的 UI 并渲染
+      return <h1>Something went wrong.</h1>;
+    }
+
+    return this.props.children; 
+  }
+}
+
+// 使用
+<ErrorBoundary>
+  <MyWidget />
+</ErrorBoundary>
+```
 #### 27. React怎么引入svg的文件？
+1. 把svg视作和普通图片一样引入，然后在`img`标签中使用
+2. `import {ReactComponent as Logo} from './logo.svg'`，然后把`Logo`作为React组件使用
 #### 28. 说说你对Relay的理解
+Relay是Facebook在React.js Conf（2015年1月）上首次公开的一个新框架，用于为React应用处理数据层问题。在Relay中，每个组件都使用一种叫做GraphQL的查询语句声明对数据的依赖。组件可以使用 this.props 访问获取到的数据。主要用于超大型项目中。（简单的说就是在使用GraphQL接口标准时，在React层的处理库）
+
 #### 29. 在React中你有经常使用常量吗？
+* 按照ES规范，代码中不变的量都会通过`const`定义成常量
+* 函数式组件中，函数组件也会定义成一个常量
+* 结合Redux使用时，把`actionType`定义成一个字符串常量
 #### 30. 为什么说React中的props是只读的？
+React是单项数据流，props是父组件到子组件的值，为了数据的稳当和代码可预见性，props被设计成只读的。
