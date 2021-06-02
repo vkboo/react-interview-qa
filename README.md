@@ -126,22 +126,18 @@ function IntlComponent({ setLocale }) {
 #### 8. 怎么实现React组件的国际化呢？
 借助第三方库，如react-intl。定一个页面中需要用到的字符文件，使用的时候使用FormattedMessage进行填充即可。(代码如上题)
 #### 9. 说说Context有哪些属性？
-
 - 创建：
 ```javascript
 const MyContext = React.createContext(initialValue)
 ```
-
 - 注入: 
 ```jsx
 <MyContext.Provider value={usedValue}></MyContext.Provider>
 ```
-
 - 调试：
 ```JavaScript
 Mycontext.displayName = 'MyContextComponent';
 ```
-
 - 使用: 
    - 使用Consumer
 ```jsx
@@ -149,7 +145,6 @@ Mycontext.displayName = 'MyContextComponent';
   {value => {/** JSX */}}
 </MyContext.Consumer>
 ```
-
    - 使用`ContextType`(class组件)
 ```jsx
 // 前置代码
@@ -223,25 +218,40 @@ export default ThemedButton;
 ```
 #### 10. 怎么使用Context开发组件？
 （同上题，考察React Context API的基本用法）
-
 #### 11. 为什么React并不推荐我们优先考虑使用Context?
 1. 题目比较老了，在初始推出时，Context API始终是作为一个beta性质而存在，所以不推荐使用
 2. React中，最简单、影响渲染范围最小的是state & props，如果能用这两者解决的问题，没必要使用Context
 3. Context如果涉及渲染的组件较多，那么很可能产生对渲染性能的问题，而社区的库，如`React-Redux``Mobx`等，则会在库内部去做性能优化
 4. 简单的使用Context的话，不利于数据的追踪，而`Redux`等第三方库在这方面做的更好
-
 #### 12. 除了实例的属性可以获取Context外哪些地方还能直接获取Context呢?
 还有的方式有(上面的代码都有演示，这里就不再贴代码了)：
 1. Context.Consumer组件
 2. hooks: useContext
-
 #### 13. childContextTypes是什么？它有什么用？
 （过时的api，无需关注）
-
 #### 14. contextType是什么？它有什么用？
 `contextType`是React class组件的静态属性，将Context赋给这个静态属性后，再用组件的实例`.context`即可获取相应Context的值（上面有代码展示）。
-
 #### 15. Consumer向上找不到Provider的时候怎么办？
 找不到就取`React.createContext(initialValue)`中的默认值`initialValue`
 #### 16. 有使用过Consumer吗？
 用过。上面有代码。具体再补充一点，如果组件中需要使用多个Context的使用，需要使用多个`<Context.Consumer>`组件的嵌套，此种情况下，`useContext`肯定是更好的选择。
+#### 17. 在React怎么使用Context？
+（同[第9题](#9-说说context有哪些属性)）
+#### 18. React15和16分别支持IE几以上？
+（古老的问题，可忽略）
+React15：>IE8
+React16: >=IE11
+#### 19. 说说你对windowing的了解
+在涉及到超长列表的场景时，如果不进行分页，一次性塞入大量的DOM，会对性能造型影响。这时候，就要用上windowing即“虚拟列表”技术，它的原理是随着用户的滚动，只渲染部分（一般是用户可见的那一部分）DOM，以此来减少性能消耗。在React中，可以使用`react-window`` `库进行实现。
+#### 20. 举例说明React的插槽有哪些运用场景？
+应用中全局的弹框，从逻辑上讲需要不与业务组件嵌套，一般来说还要与应用的根组件平级的；
+#### 21. 你有用过React的插槽（Portals）吗？怎么用？
+#### 22. React的严格模式有什么好处？
+#### 23. React如果进行代码拆分？拆分的原则是什么？
+#### 24. React组件的构造函数有什么用？
+#### 25. React组件的构造函数是必须的吗？
+#### 26. React中在哪捕获错误？
+#### 27. React怎么引入svg的文件？
+#### 28. 说说你对Relay的理解
+#### 29. 在React中你有经常使用常量吗？
+#### 30. 为什么说React中的props是只读的？
