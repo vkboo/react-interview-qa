@@ -332,11 +332,12 @@ function Child() {
 1. 首屏就要展示的组件不拆分
 2. 根据路由进行拆分
 #### 24. React组件的构造函数有什么用？
+* 调用父类（即`React.Component`）的构造函数，内部`super(props)`，使当前类的`this`关键字可用（关于为什么要`super(props)`可以看[这里](https://overreacted.io/zh-hans/why-do-we-write-super-props/)）
 * 对类中函数的`this`进行绑定
 * 定义初始的`state`的值
 * 定义实例变量，如`ref`
 #### 25. React组件的构造函数是必须的吗？
-不是。根据ES6的语法，不写如构造函数，默认也会载入构造函数里面只有一句代码`super(this)`用以调用父类的构造函数，用以让当前类得到`this`对象
+不是。函数式组件没有构造函数，类组件，根据ES6的语法，不写入构造函数，默认也会载入构造函数里面只有一句代码`super(this)`用以调用父类的构造函数，用以让当前类得到`this`对象
 #### 26. React中在哪捕获错误？
 React可以使用特定的类组件包裹目标组件，进行错误边界的处理。错误边界组件需要声明静态方法`getDerivedErrorFromError(error)`和实例方法`componentDidCatch(error, errorInfo)`对子组件的错误进行捕获，在`render`方法中，可以自定义降级UI的渲染显示；示例代码如下;
 ```jsx
