@@ -9,7 +9,7 @@ React自身的数据只支持从父到子的传递，在兄弟组件和从子到
 标签内换行导致的语法问题，即`JSX`一个整体本质上是一个对象，用`()`包起来也很合理
 #### 3. componentWillUpdate可以直接修改state的值吗？
 不能。`componentWillUpdate`发生在`state`或`props`改变的情况下，在`shouldComponentUpdate`返回`true`且在`render`前执行，如果在`componentWillUpdate`中进行了`setState`或者`Redux`中的`dispatch(action)`操作，会导致`Maximum update depth exceeded`错误。
-#### 4.说说你对React的渲染原理的理解
+#### **4. 说说你对React的渲染原理的理解
 React的数据源是两个部分：`state`和`props`；`state`的改变且当前组件的`JSX`引用了这个state，会引起当前组件render函数的渲染，props的改变，不管子组件的JSX中有没有挂载这个prop，都会触发子组件的render函数执行；render函数的执行，不代表会进行DOM的渲染，React内部的Fiber算法，会对新旧的虚拟DOM进行比较，如果不一致，才会进行新DOM的渲染。
 #### 5. 什么是渲染劫持
 一般通过hoc函数实现，重新目标组件的props state render函数，实现不限于组件渲染、条件渲染等功能；以下实现一个最简单的渲染劫持demo
@@ -137,6 +137,11 @@ const MyContext = React.createContext(initialValue)
 <MyContext.Provider value={usedValue}></MyContext.Provider>
 ```
 
+- 调试：
+```JavaScript
+Mycontext.displayName = 'MyContextComponent';
+```
+
 - 使用: 
    - 使用Consumer
 ```jsx
@@ -220,9 +225,10 @@ export default ThemedButton;
 （同上题，考察React Context API的基本用法）
 
 #### 11. 为什么React并不推荐我们优先考虑使用Context?
-1. 题目比较老了，因为在16.x的版本中，Context API始终是作为一个beta性质而存在，所以不推荐使用
+1. 题目比较老了，在初始推出时，Context API始终是作为一个beta性质而存在，所以不推荐使用
 2. React中，最简单、影响渲染范围最小的是state & props，如果能用这两者解决的问题，没必要使用Context
 3. Context如果涉及渲染的组件较多，那么很可能产生对渲染性能的问题，而社区的库，如`React-Redux``Mobx`等，则会在库内部去做性能优化
+4. 简单的使用Context的话，不利于数据的追踪，而`Redux`等第三方库在这方面做的更好
 
 #### 12. 除了实例的属性可以获取Context外哪些地方还能直接获取Context呢?
 还有的方式有(上面的代码都有演示，这里就不再贴代码了)：
