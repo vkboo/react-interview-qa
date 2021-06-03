@@ -442,11 +442,10 @@ React没有将事件和属性的传递分开，都是作为props进行传递，�
 render函数的渲染原理可以参考第4题。返回的数据类型是`ReactNode`。`ReactNode`是以下数据中的一种：
 * string
 * number
-* {}
 * boolean
 * null
 * ReactElement
 * ReactNodeArray
 ### 45. useEffect和useLayoutEffect有什么区别？
 * useEffect 是异步执行的，而useLayoutEffect是同步执行的
-* useEffect的执行时机是浏览器完成渲染之后，useLayoutEffect的执行时机是render函数执行后还没有渲染到DOM之前，和componentDidMount等价
+* useEffect的执行时机是浏览器完成渲染之后，useLayoutEffect的执行时机是还没有渲染到DOM之前，和componentDidMount等价
