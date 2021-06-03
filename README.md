@@ -402,18 +402,51 @@ Relay是Facebook在React.js Conf（2015年1月）上首次公开的一个新框�
 * 结合Redux使用时，把`actionType`定义成一个字符串常量
 #### 30. 为什么说React中的props是只读的？
 React是单项数据流，props是父组件到子组件的值，为了数据的稳当和代码可预见性，props被设计成只读的。
-### 31. 你有使用过formik库吗？说说它的优缺点
+### **31. 你有使用过formik库吗？说说它的优缺点
 ### 32. 你有用过哪些React的表单库吗？说说它们的优缺点
+用过Antd的表单组件Form。
+优点如下：
+1. 自动的实现受控组件，实现双向绑定
+2. 内置表单验证工具与表单错误的提示UI
 ### 33. 如果组件的属性没有传值，那么它的默认值是什么？
+Boolean值：`true`
 ### 34. 可以使用TypeScript写React应用吗？怎么操作？
-### 35. super()和super(props)有什么区别？
+可以，例如create-react-app脚手架，使用typescript模板就行，组件文件也可以是`.tsx`作为后缀。
+在代码中需要足以泛型与接口的使用，如果props与state可以用泛型规定其结构，props的类型可以用typescript的强制类型来规范。
+### 35. `super()`和`super(props)`有什么区别？
+都是调用父类的构造函数，`super()`虽然没有传参，但是在React内部，还是把props挂载到了当前组件类上，但是使用`super()`的方式，在构造函数中都无法使用`this.props`（其它地方可以使用），`super(props)`，可以在构造函数中使用`this.props`.
 ### 36. 你有使用过loadable组件吗？它帮我们解决了什么问题？
-### 37. 你有使用过suspense组件吗？它帮我们解决了什么问题？
+使用过。在React.lazy组件出现之前，原生React没有提供懒加载的方案，loadable库解决了这一问题。同时还提供加加载中的loading方案与加载失败的显示方案。
+### **37. 你有使用过suspense组件吗？它帮我们解决了什么问题？
 ### 38. 怎样动态导入组件？
-### 39. 如何给非控组件设置默认的值？
+1. 使用第三方库，比如`react-loadable`;
+2. 使用`React.lazy`
+### 39. 如何给非受控组件设置默认的值？
+给非受控组件的`defaultValue`属性赋值
 ### 40. 怎么在React中引入其它的UI库，例如Bootstrap
+1. npm install antd
+2. ```js 
+    import { Button } from 'antd';
+   ```
+3. ```jsx
+    const App = () => (<Button>button</Button>)
+   ```
 ### 41. 怎样将事件传递给子组件？
+React没有将事件和属性的传递分开，都是作为props进行传递，只是事件的prop是一个function，根据所需的业务逻辑，子组件在相应的时候触发`this.props.onPropFuc`即触发了父组件传递过来的方法。
 ### 42. 怎样使用Hooks获取服务端数据？
+函数式组件没有class组件中生命周期的概念，
 ### 43. 使用Hooks要遵守哪些原则？
+1. hooks只能在函数式组件中使用；
+2. 为了保证执行的顺序，hook只能作用在函数的顶级作用域，不能写在内部的代码块(如if判断)中
 ### 44. render方法的原理你有了解吗？它返回的数据类型是什么？
-### 45. seEffect和useLayoutEffect有什么区别？
+render函数的渲染原理可以参考第4题。返回的数据类型是`ReactNode`。`ReactNode`是以下数据中的一种：
+* string
+* number
+* {}
+* boolean
+* null
+* ReactElement
+* ReactNodeArray
+### 45. useEffect和useLayoutEffect有什么区别？
+* useEffect 是异步执行的，而useLayoutEffect是同步执行的
+* useEffect的执行时机是浏览器完成渲染之后，useLayoutEffect的执行时机是render函数执行后还没有渲染到DOM之前，和componentDidMount等价
