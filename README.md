@@ -512,3 +512,19 @@ render函数的渲染原理可以参考第4题。返回的数据类型是`ReactN
 ### 45. useEffect和useLayoutEffect有什么区别？
 * useEffect 是异步执行的，而useLayoutEffect是同步执行的
 * useEffect的执行时机是浏览器完成渲染之后，useLayoutEffect的执行时机是还没有渲染到DOM之前，和componentDidMount等价
+### 46. 在React项目中你用过哪些动画的包？
+### 47. React必须使用JSX吗?
+### 48. 自定义组件时render是可选的吗？为什么？
+### 49. 需要把keys设置为全局唯一吗？
+### 50. 怎么定时更新一个组件？
+### 51. React根据不同的环境打包不同的域名？
+### 52. 使用webpack打包React项目，怎么减小生成的js大小？
+### 53. 在React中怎么使用async/await？
+### 54. 你阅读了几遍React的源码？都有哪些收获？你是怎么阅读的？
+### 55. 什么是React.forwardRef？它有什么作用？
+### 56. 写个例子说明什么是JSX的内联条件渲染
+### 57. 在React中怎么将参数传递给事件？ 
+### 58. React的事件和普通的HTML事件有什么不同？
+### 59. 在React中怎么阻止事件的默认行为？
+### 60. 你最喜欢React的哪一个特性（说一个就好）？
+
