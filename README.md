@@ -402,8 +402,11 @@ Relay是Facebook在React.js Conf（2015年1月）上首次公开的一个新框�
 * 结合Redux使用时，把`actionType`定义成一个字符串常量
 #### 30. 为什么说React中的props是只读的？
 React是单项数据流，props是父组件到子组件的值，为了数据的稳当和代码可预见性，props被设计成只读的。
-### **31. 你有使用过formik库吗？说说它的优缺点
-### **32. 你有用过哪些React的表单库吗？说说它们的优缺点
+### 31. 你有使用过formik库吗？说说它的优缺点
+Formik提供了便捷的表单操作， 如获取表单数据，表单校验，提交事件等
+结合yup来设置表单校验规则非常方便
+(只用过andtd Form的表单验证，看了Formik的API，是概览是差不多的)
+### 32. 你有用过哪些React的表单库吗？说说它们的优缺点
 用过Antd的表单组件Form。
 优点如下：
 1. 自动的实现受控组件，实现双向绑定
@@ -426,7 +429,17 @@ yarn add typescript @types/node @types/react @types/react-dom @types/jest
 都是调用父类的构造函数，`super()`虽然没有传参，但是在React内部，还是把props挂载到了当前组件类上，但是使用`super()`的方式，在构造函数中都无法使用`this.props`（其它地方可以使用），`super(props)`，可以在构造函数中使用`this.props`.
 ### 36. 你有使用过loadable组件吗？它帮我们解决了什么问题？
 使用过。主要解决打包文件体积过大的问题，用于代码分割。在React.lazy组件出现之前，原生React没有提供懒加载的方案，loadable库解决了这一问题。同时还提供加加载中的loading方案与加载失败的显示方案。
-### **37. 你有使用过suspense组件吗？它帮我们解决了什么问题？
+### 37. 你有使用过suspense组件吗？它帮我们解决了什么问题？
+这个组件还是实验阶段，不能投入生产环境使用。
+用于数据获取的 Suspense 是一个新特性，你可以使用 `<Suspense>` 以声明的方式来“等待”任何内容，包括数据。
+示例如下
+```jsx
+const ProfilePage = React.lazy(() => import('./ProfilePage')); // 懒加载
+// 在 ProfilePage 组件处于加载阶段时显示一个 spinner
+<Suspense fallback={<Spinner />}>
+  <ProfilePage />
+</Suspense>
+```
 ### 38. 怎样动态导入组件？
 1. 使用第三方库，比如`react-loadable`;
 ```jsx
@@ -445,10 +458,22 @@ export default class App extends React.Component {
 }
 
 ```
-2. 使用`React.lazy`
+2. 使用`React.lazy`+`Suspense`
 ```jsx
 // 使用 React.lazy
-const OtherComponent = React.lazy(() => import('./OtherComponent'))
+import React, { Suspense } from 'react';
+
+const OtherComponent = React.lazy(() => import('./OtherComponent'));
+
+function MyComponent() {
+  return (
+    <div>
+      <Suspense fallback={<div>Loading...</div>}>
+        <OtherComponent />
+      </Suspense>
+    </div>
+  );
+}
 ```
 ### 39. 如何给非受控组件设置默认的值？
 给非受控组件的`defaultValue`属性赋值
@@ -474,8 +499,8 @@ const App = () => {
 }
 ```
 ### 43. 使用Hooks要遵守哪些原则？
-1. hooks只能在函数式组件中使用；
-2. 为了保证执行的顺序，hook只能作用在函数的顶级作用域，不能写在内部的代码块(如if判断)中
+1. hooks只能在函数式组件和自定义hook中使用；
+2. 为了保证执行的顺序，hook只能作用在函数的顶级作用域，不能写在循环、条件语句或嵌套函数中
 ### 44. render方法的原理你有了解吗？它返回的数据类型是什么？
 render函数的渲染原理可以参考第4题。返回的数据类型是`ReactNode`。`ReactNode`是以下数据中的一种：
 * string
