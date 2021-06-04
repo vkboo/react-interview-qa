@@ -513,7 +513,8 @@ render函数的渲染原理可以参考第4题。返回的数据类型是`ReactN
 * useEffect 是异步执行的，而useLayoutEffect是同步执行的
 * useEffect的执行时机是浏览器完成渲染之后，useLayoutEffect的执行时机是还没有渲染到DOM之前，和componentDidMount等价
 ### 46. 在React项目中你用过哪些动画的包？
-react-transition-group
+react-transition-group: 一般的、比较简单的动画
+react-motion: 复杂、精致的动画
 ### 47. React必须使用JSX吗?
 不是必须的。`JSX`是`React.createElement(type, props, children)`的语法糖，以下分别用JSX和createElement代码，render的结果都是完全一致的。
 ```jsx
@@ -555,7 +556,7 @@ export default App;
 ```
 ### 48. 自定义组件时render是可选的吗？为什么？
 函数式组件没有render方法。自定义class组件的render是必须的。
-原因：***??
+原因：render函数是class组件的核心，它返回虚拟DOM，如果没有虚拟DOM，那么组件就没有意义。
 补充：当一个自定义class组件，继承另一个组件的时候，render不是必须的，它会自动继承父类的render方法。
 ### 49. 需要把keys设置为全局唯一吗？
 不需要，只需要在同层级保持唯一即可。最好用id作`key`值，尽量不要用索引作为`key`值。
@@ -771,5 +772,5 @@ class Component extends React.Component {
 }
 ```
 ### 60. 你最喜欢React的哪一个特性（说一个就好）？
-函数即组件，并且函数是组件总是一个纯函数，减少不可控性。
+Hooks.可以对代码进行解耦，更优雅、直观的拆分和复用代码。
 
