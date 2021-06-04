@@ -773,4 +773,19 @@ class Component extends React.Component {
 ```
 ### 60. 你最喜欢React的哪一个特性（说一个就好）？
 Hooks.可以对代码进行解耦，更优雅、直观的拆分和复用代码。
+### 61. 在React中什么时候使用箭头函数更方便呢？
+### 62. 你最不喜欢React的哪一个特性（说一个就好）？
+### 63. 说说你对React的reconciliation（一致化算法）的理解
+### 64. 使用PropTypes和Flow有什么区别？
+### 65. 怎样有条件地渲染组件？
+### 66. 在JSX中如何写注释？
+### 67. constructor和getInitialState有不同？
+### 68. 写例子说明React如何在JSX中实现for循环
+### 69. 为什么建议Fragment包裹元素？它的简写是什么？
+### 70. 你有用过React.Fragment吗？说说它有什么用途？
+### 71. 在React中你有遇到过安全问题吗？怎么解决？
+### 72. React中如何监听state的变化？
+### 73. React什么是有状态组件？
+### 74. React v15中怎么处理错误边界？
+### 75. React Fiber它的目的是解决什么问题？
 
