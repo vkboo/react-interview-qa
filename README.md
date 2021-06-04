@@ -513,17 +513,245 @@ render函数的渲染原理可以参考第4题。返回的数据类型是`ReactN
 * useEffect 是异步执行的，而useLayoutEffect是同步执行的
 * useEffect的执行时机是浏览器完成渲染之后，useLayoutEffect的执行时机是还没有渲染到DOM之前，和componentDidMount等价
 ### 46. 在React项目中你用过哪些动画的包？
+react-transition-group
 ### 47. React必须使用JSX吗?
+不是必须的。`JSX`是`React.createElement(type, props, children)`的语法糖，以下分别用JSX和createElement代码，render的结果都是完全一致的。
+```jsx
+// jsx语法
+import React, { useState, useEffect } from 'react';
+
+const App = () => {
+    const [list, setList] = useState([]);
+    useEffect(() => {
+        setList([1, 2, 3])
+    }, []);
+
+    return <ul className="container">
+        {list.map(e => <li key={e}>{e}</li>)}
+    </ul>
+}
+
+export default App;
+
+// React.createElement
+import React, { useState, useEffect } from 'react';
+
+const App = () => {
+    const [list, setList] = useState([]);
+    useEffect(() => {
+        setList([1, 2, 3])
+    }, []);
+
+    return React.createElement(
+        'ul',
+        { className: 'container', },
+        list.map(e => {
+            return React.createElement('li', { key: e, }, e);
+        }),
+    )
+}
+
+export default App;
+```
 ### 48. 自定义组件时render是可选的吗？为什么？
+函数式组件没有render方法。自定义class组件的render是必须的。
+原因：***??
+补充：当一个自定义class组件，继承另一个组件的时候，render不是必须的，它会自动继承父类的render方法。
 ### 49. 需要把keys设置为全局唯一吗？
+不需要，只需要在同层级保持唯一即可。最好用id作`key`值，尽量不要用索引作为`key`值。
 ### 50. 怎么定时更新一个组件？
+使用定时器，注意在组件销毁的生命周期清除定时器。
+```jsx
+// class组件
+class Clock extends React.Component{
+    constructor(props){
+        super(props);
+        this.state={date:new Date()};
+    }
+    componentDidMount(){
+        this.timerID=setInterval(()=>this.tick(),1000);
+    }
+    componentWillUnmount(){
+        clearInterval(this.timerID);
+    }
+    tick(){
+        this.setState({
+            date:new Date()
+        });
+    }
+    render(){
+        return (
+            <div>
+                <h2>Timer {this.state.date.toLocaleTimeString()}.</h2>
+            </div>
+        );
+    }
+}
+ReactDOM.render(
+    <Clock />,
+    document.getElementById('root')
+);
+
+// hook
+import React, { useState, useEffect } from 'react'
+
+export default function TimerHooks () {
+  const [date, setDate] = useState(new Date())
+
+  useEffect(() => {
+    let timerId = setInterval(() => {
+      setDate(new Date())
+    }, 1000)
+
+    return () => {
+      clearInterval(timerId)
+    }
+  }, []);
+
+  return (
+    <div>
+      <p>时间: {date.toLocaleTimeString()}</p>
+    </div>
+  )
+}
+```
 ### 51. React根据不同的环境打包不同的域名？
+如果是`create-react-app`,可以通过项目根目录的`.env`、`.env.development`、`.env.production`来区分不同的环境（打包命令），在上面的文件内写入`REACT_APP_`作为前缀的环境变量，在业务代码中读取相应的环境变量即可。
+不管是什么脚手架工具的项目，都可以通过在`package.json`的`scripts`，中通过`cross-env`写入环境变量，如下：
+```
+"dev:test": "cross-env REACT_APP_BASEURL=http://test.domain.com react-scripts start"
+```
 ### 52. 使用webpack打包React项目，怎么减小生成的js大小？
+* 使用react-loadable进行懒加载
+* webpack splitChunkPlugin进行代码分割
+* webpack UglifyjsWebpackPlugin进行代码压缩
+* webpack CompressionWebpackPlugin进行网络传输压缩gzip
+* webpack mini-css-extract-plugin抽取CSS代码
 ### 53. 在React中怎么使用async/await？
+`create-react-app`、`umi`等搭建的项目都可以直接使用，如果脚手架不支持，可以安装Babel插件`@babel/plugin-transform-async-to-generator`，并在`.babelrc`文件中加上以下的配置
+```json
+{
+  "plugins": [
+    [
+      "@babel/plugin-transform-async-to-generator",
+      // 以下是可选配置
+      {
+        "module": "bluebird",
+        "method": "coroutine"
+      }
+    ]
+  ]
+}
+```
 ### 54. 你阅读了几遍React的源码？都有哪些收获？你是怎么阅读的？
+(0遍，这道题没法回答😅)
 ### 55. 什么是React.forwardRef？它有什么作用？
+背景：
+作用:
+* 转发 refs 到 DOM 组件
+* 在高阶组件中使用，通过props中转转发ref到WrappedComponent,例子如下:
+```jsx
+import React, { useRef } from 'react';
+
+// 子组件
+class CustomInput extends React.Component {
+
+    inputRef = React.createRef(null);
+
+    focus() {
+        this.inputRef.current.focus();
+    }
+
+    render() {
+        const { count } = this.props;
+        return (
+            <p>
+                <span>自定义input: {count}</span>
+                <input ref={this.inputRef} />
+            </p>
+        )
+    }
+}
+
+// 高阶组件封装
+function hoc(WrappedComponent) {
+    class HWrappedComponent extends React.Component {
+        render() {
+            const { forwardRef, ...rest } = this.props;
+            return (
+                <WrappedComponent {...rest} ref={forwardRef} />
+            )
+        }
+    }
+
+    return React.forwardRef((props, ref) => {
+        return <HWrappedComponent {...props} forwardRef={ref} />
+    })
+
+}
+
+const HocCustomInput = hoc(CustomInput);
+
+const App = () => {
+    const ref = useRef(null);
+    const handleFocus = () => {
+        ref.current.focus();
+    }
+    return (
+        <>
+            <HocCustomInput ref={ref} count={12} />
+            <button onClick={handleFocus}>focus</button>
+        </>
+    )
+};
+
+export default App;
+```
 ### 56. 写个例子说明什么是JSX的内联条件渲染
+```jsx
+import { useState } from "react";
+
+const App = () => {
+    const [flag] = useState(true)
+    const button = null;
+    if (flag) {
+        button = <button>1</button>
+    } else {
+        button = <button>0</button>
+    }
+    return (
+        <>
+            { flag ? <h1>true</h1> : <h1>false</h1> }
+            { flag && <span>ok</span> }
+            { button }
+        </>
+    )
+};
+
+export default App;
+```
 ### 57. 在React中怎么将参数传递给事件？ 
+箭头函数和`Function.prototype.bind`来实现事件中参数的传递.
+```jsx
+import { useState } from "react";
+
+const App = () => {
+    const handleA = (...args) => {
+        console.log(args); // [syntheticEvent, 'a', 'b']
+    }
+    const handleB = (...args) => {
+        console.log(args); // ['a', 'b', syntheticEvent]
+    }
+    return (
+        <>
+            <button onClick={event => handleA(event, 'a', 'b')}>AAA</button>
+            <button onClick={handleB.bind(null, 'a', 'b')}>BBB</button>
+        </>
+    )
+};
+
+export default App;
+```
 ### 58. React的事件和普通的HTML事件有什么不同？
 ### 59. 在React中怎么阻止事件的默认行为？
 ### 60. 你最喜欢React的哪一个特性（说一个就好）？
