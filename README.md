@@ -753,6 +753,23 @@ const App = () => {
 export default App;
 ```
 ### 58. React的事件和普通的HTML事件有什么不同？
+React的事件系统是合成事件。
+在React17之前，所有的事件都是挂载在document上的，页面中各节点的事件都是在document上触发通过事件委托分发下来的。
+React17的版本中，所有事件变更到挂载到`ReactDOM.render`挂载的根节点。并且取消了事件池
+优点：将事件绑定在document统一管理，防止很多事件直接绑定在原生的dom元素上。造成一些不可控的情况;React 想实现一个全浏览器的框架，为了实现这种目标就需要提供全浏览器一致性的事件系统，以此抹平不同浏览器的差异。
+
 ### 59. 在React中怎么阻止事件的默认行为？
+```javascript
+class Component extends React.Component {
+    handleEvent = event => {
+        // 合成事件的方法，非原生的preventDefault
+        event.preventDefault();
+    }
+    render () {
+        //...
+    }
+}
+```
 ### 60. 你最喜欢React的哪一个特性（说一个就好）？
+函数即组件，并且函数是组件总是一个纯函数，减少不可控性。
 
