@@ -778,8 +778,17 @@ Hooks.可以对代码进行解耦，更优雅、直观的拆分和复用代码�
 * class组件中需要绑定事件的`this`，可以使用`public class fields`语法，用箭头函数的方式定义一个函数是类的属性
 ### 62. 你最不喜欢React的哪一个特性（说一个就好）？
 * CSS的方案还有缺陷，利用css module可以解决css作用域的问题，但是在代码调试上因为浏览器的类名和代码类名不一致，所以并不直观。
-### **63. 说说你对React的reconciliation（一致化算法）的理解
-### **64. 使用PropTypes和Flow有什么区别？
+### 63. 说说你对React的reconciliation（一致化算法）的理解
+reconciliation指的是React在render之后对旧的元素树转换成新的元素树的最小操作的一套算法。该算法主要通过以下两方面进行优化。
+* 两个不同类型的元素会产生不同的树
+    - 对比不同类型的元素时，React对卸载掉整个元素以及其子元素，用新的元素来替代
+    - 对比相同类型的元素时，React会保持元素不变，仅更新组件中改变了的属性，处理完成之后，继续递归对子节点进行比较
+    - 对比同类型的组件时，组件的实例会保持不变，因为可以保持state的不变，React将更新props，触发组件更新相关的生命周期
+* 通过开发者给组件制定`key`属性，来告知渲染哪些子元素在不同的渲染下可以保持不变
+    - `key`属性解决的就是列表在进行一对一比较的过程中，新元素树，从中间或者顶部插入的问题；例如，从顶部插入，那么react一对一的往下比较，那么每次比较都是不相同的，react会重建每一个元素；指定了key值之后，react会按照key值进行比较，react就会知道原有的列表只是往下移动了而已，创建的元素只有顶部的一个
+### 64. 使用PropTypes和Flow有什么区别？
+* Flow 是一个针对react项目所有 JavaScript 代码的静态类型检测器，需要单独添加依赖并手动运行（换成ts也是类似的答案）
+* PropTypes是针对组件级别的类型检测
 ### 65. 怎样有条件地渲染组件？
 （同[第56题](#56-写个例子说明什么是JSX的内联条件渲染)）
 ### 66. 在JSX中如何写注释？
@@ -796,51 +805,90 @@ const Demo = () => (
 ```
 ### 67. constructor和getInitialState有不同？
 constructor是生命周期的第一步，用于做一些初始化的工作，比如state的初始值，事件this的绑定等。
-(getInitialState是老API了，不用了解)
+(getInitialState是老API了，相当于ES5使用React.createClass下的构造函数，不用了解)
 ### 68. 写例子说明React如何在JSX中实现for循环
 ```JSX
 const Demo = () => {
     const list = [1,2,3];
     return (
         <ul>
+            {/* Array.prototype.filter 同理 */}
             { list.map(e => <li key={e}>{e}</li>) }
         </ul>
     )
 }
 ```
 ### 69. 为什么建议Fragment包裹元素？它的简写是什么？
-动机：jsx表达式必须用一个父元素把它们包起来，Fragments用于一个组件返回多个自元素列表的情况，需要用`<React.Fragment>`把它们包起来
+动机：jsx表达式必须用一个父元素把它们包起来，Fragments用于一个组件返回多个自元素列表的情况，需要用`<React.Fragment>`把它们包起来，避免总是需要使用一个父元素如`<div>`在包裹组件。且`<React.Fragment>`不会产生多余的DOM标签。
 简写：`<>{ReactNodeList}</>`，注意简写不能加上`key`属性，只有`<React.Fragment>`的写法才可以
 ### 70. 你有用过React.Fragment吗？说说它有什么用途？
-有用过。jsx表达式必须用一个父元素把它们包起来，Fragments用于一个组件返回多个自元素列表的情况，需要用`<React.Fragment>`把它们包起来
+有用过。jsx表达式必须用一个父元素把它们包起来，Fragments用于一个组件返回多个自元素列表的情况，需要用`<React.Fragment>`把它们包起来，避免总是需要使用一个父元素如`<div>`在包裹组件。且`<React.Fragment>`不会产生多余的DOM标签。
 ### 71. 在React中你有遇到过安全问题吗？怎么解决？
 * XXS攻击：使用了`dangerouslySetInnerHtml`属性，可以直接调用浏览器原生的`innerHTML`接口，设置富文本，可能会导致XXS攻击的问题，所以需要对用户设置的内容进行过滤
 ### 72. React中如何监听state的变化？
-可以使用ES6 class中的getter属性，代码示例如下
+* class组件使用`shouldComponentUpdate`
 ```jsx
 import React from 'react';
-class Demo extends React.Component {
-    state = {
-        count: 1
-    }
-
-    get cp_state() {
-        return this.state.count * 2;
-    }
-
+export default class Demo extends React.Component {
+    state = { count: 1 }
     handleAdd = () => {
         this.setState(prevState => ({
             count: prevState.count + 1,
-        }));
+        }))
     }
-
+    shouldComponentUpdate(nextProps, nextState) {
+        if (nextState.count !== this.state.count) {
+            console.log({
+                'old count': this.state.count,
+                'new count': nextState.count,
+            })
+        }
+        return true;
+    }
     render () {
-        return <React.Fragment>
+        return <>
             <h1>{this.state.count}</h1>
-            <h1>{this.cp_state}</h1>
             <button onClick={this.handleAdd}>ADD</button>
-        </React.Fragment>
-    }
+        </>
+    }   
+}
+```
+* 函数式组件使用`useEffect`
+```jsx
+import { useState, useEffect, useRef } from 'react';
+
+function useUpdate(fn, deps) {
+    const isFirst = useRef(true);
+    useEffect(() => {
+        if (isFirst.current) {
+            return isFirst.current = false;
+        }
+        fn()
+    }, deps)
+}
+
+function usePrevValue (value) {
+    const prevRef = useRef(value);
+    useEffect(() => {
+        prevRef.current = value;
+    }, [value]);
+    return prevRef.current;
+}
+
+const Demo = () => {
+    const [count, setCount] = useState(0);
+    const prevCount = usePrevValue(count);
+    useUpdate(() => {
+        console.log({
+            'old count': prevCount,
+            'new count': count,
+        })
+    }, [count])
+
+    return <>
+        <h1>{count}</h1>
+        <button onClick={() => setCount(count + 1)}>ADD</button>
+    </>
 }
 export default Demo;
 ```
@@ -849,6 +897,14 @@ export default Demo;
 ### 74. React v15中怎么处理错误边界？
 (过时的API，无需关注，最新的错误边界处理可以参考[第26题](#26-React中在哪捕获错误？)
 ### **75. React Fiber它的目的是解决什么问题？
+React 15 的 StackReconciler 方案由于递归不可中断问题，如果 Diff 时间过长（JS计算时间），会造成页面 UI 的无响应（比如输入框）的表现，vdom 无法应用到 dom 中。
+
+为了解决这个问题，React 16 实现了新的基于 requestIdleCallback 的调度器（因为 requestIdleCallback 兼容性和稳定性问题，自己实现了 polyfill），通过任务优先级的思想，在高优先级任务进入的时候，中断 reconciler。
+
+为了适配这种新的调度器，推出了 FiberReconciler，将原来的树形结构（vdom）转换成 Fiber 链表的形式（child/sibling/return），整个 Fiber 的遍历是基于循环而非递归，可以随时中断。
+
+更加核心的是，基于 Fiber 的链表结构，对于后续（React 17 lane 架构）的异步渲染和 （可能存在的）worker 计算都有非常好的应用基础
+
 ### 76. React为什么不要直接修改state？如果想修改怎么做？
 直接修改state的情况，React库内部无法检测到state的变化，从而来触发re-render。如果要修改state的值，需要在组件中调用`this.state()`方法.
 ```jsx
@@ -859,7 +915,7 @@ export default Demo;
 * 提供了诸如typescript等各种开发模版
 ### 78. 装饰器(Decorator)在React中有什么应用？
 在React中装饰器的本质就是用装饰器函数包裹一个类，所以，所有的HOC方案，都可以用装饰器的语法糖来调用，显得非常的直观。
-如自定义的HOC，react-redux的connect函数，Mobx中的@observable、@computed、@action,mobx-react中的@observer.
+如自定义的HOC，react-router的withRouter函数，react-redux的connect函数，Mobx中的@observable、@computed、@action,mobx-react中的@observer.
 ### 79. 使用高阶组件(HOC)实现一个loading组件
 ```JSX
 // app.jsx
@@ -931,19 +987,101 @@ export default Child;
 * layout: 结构性的展示型组件，一般是无状态的，如header、footer等
 * components: 公用的组件，既有props的传入，内部也有自己的state进行处理
 * pages: 页面级组件，有状态组件，通过调用上面两种类型的组件，传入相应的props，一般与路由挂在一下，逻辑上会进行ajax请求等副作用操作
-### 83. 举例说明如何在React创建一个事件
+### **83. 举例说明如何在React创建一个事件
 ```jsx
-const Demo = () => {
-    const handleClick = () => {
-        // 事件处理代码
-    }
-    return <button onClick={handleClick}>add</button>
+import React, { Component } from 'react';
+import ReactDOM from 'react-dom';
+var EventEmitter = require('events').EventEmitter;
+let emitter = new EventEmitter();
+
+class ListItem extends Component {
+  static defaultProps = {
+    checked: false
+  };
+  constructor(props) {
+    super(props);
+  }
+  render () {
+    return (
+      <li>
+        <input type="checkbox" checked={this.props.checked} onChange={this.props.onChange} />
+        <span>{this.props.value}</span>
+      </li>
+    );
+  }
 }
+
+class List extends Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      list: this.props.list.map(entry => ({
+        text: entry.text,
+        checked: entry.checked || false
+      }))
+    };
+    console.log(this.state);
+  }
+
+  onItemChange (entry) {
+    const { list } = this.state;
+    this.setState({
+      list: list.map(prevEntry => ({
+        text: prevEntry.text,
+        checked: prevEntry.text === entry.text ? !prevEntry.checked : prevEntry.checked
+      }))
+    });
+    //这里触发事件
+    emitter.emit('ItemChange', entry);
+  }
+  render () {
+    return (
+      <div>
+        <ul>
+          {this.state.list.map((entry, index) => {
+            return (
+              <ListItem
+                key={`list - ${index}`}
+                value={entry.text}
+                checked={entry.checked}
+                onChange={this.onItemChange.bind(this, entry)} />
+            );
+          })}
+        </ul>
+      </div>
+    );
+  }
+}
+
+class App extends Component {
+  constructor(props) {
+    super(props);
+  }
+  componentDidMount () {
+    this.itemChange = emitter.addListener('ItemChange', (msg, data) => console.log(msg));//注册事件
+  }
+  componentWillUnmount () {
+    emitter.removeListener(this.itemChange);//取消事件
+  }
+  render () {
+    return (
+      <List list={[{ text: 1 }, { text: 2 }]} />
+    )
+  }
+}
+
+ReactDOM.render(
+  <App />,
+  document.getElementById('root')
+);
 ```
 ### 84. 如何更新组件的状态？
-state的变化，即`this.setState`，还有props的变化，都会引起re-render，diffDOM之后，如果两次渲染的VNODE有差异，就会引起组件的更新。
+class组件：state的变化，即`this.setState`，还有props的变化，都会引起re-render，diffDOM之后，如果两次渲染的VNODE有差异，就会引起组件的更新。还可以使用`this.forceUpdate`，但不推荐使用，一般是render中依赖了除state和props的变量才会使用。
+函数是组件：useState中state的变化。
 ### 85. 怎样将多个组件嵌入到一个组件中？
-(没明白问什么)
+* 作为组件的children
+* render props
 ### 86. React的render中可以写{if else}这样的判断吗？
 不能。jsx中只能写js表达式，不能写js语句。
 关于js表达式和js语句的区别：语句是为了进行某种操作，一般情况下不需要返回值，而表达式都是为了得到返回值，一定会返回一个值（这里的值不包括undefined）；写之前可以想象jsx中的js代码是否能够放在`if()`中，如果可以，就可以放在jsx中。
