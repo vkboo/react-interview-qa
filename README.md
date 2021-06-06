@@ -849,4 +849,115 @@ export default Demo;
 ### 74. React v15中怎么处理错误边界？
 (过时的API，无需关注，最新的错误边界处理可以参考[第26题](#26-React中在哪捕获错误？)
 ### **75. React Fiber它的目的是解决什么问题？
+### 76. React为什么不要直接修改state？如果想修改怎么做？
+直接修改state的情况，React库内部无法检测到state的变化，从而来触发re-render。如果要修改state的值，需要在组件中调用`this.state()`方法.
+```jsx
+```
+### 77. create-react-app有什么好处？
+* 快速创建React标准工程（React+React-Router）
+* 提供了可选择的ESLint、CSS扩展语言的配置
+* 提供了诸如typescript等各种开发模版
+### 78. 装饰器(Decorator)在React中有什么应用？
+在React中装饰器的本质就是用装饰器函数包裹一个类，所以，所有的HOC方案，都可以用装饰器的语法糖来调用，显得非常的直观。
+如自定义的HOC，react-redux的connect函数，Mobx中的@observable、@computed、@action,mobx-react中的@observer.
+### 79. 使用高阶组件(HOC)实现一个loading组件
+```JSX
+// app.jsx
+import React from 'react';
+import Child from './Child.jsx';
+import HocLoading from './hocLoading';
+
+const LoadingChild = HocLoading(Child);
+
+class Demo extends React.Component {
+
+    state = {
+        loading: true,
+    }
+
+    componentDidMount() {
+        setTimeout(() => {
+            this.setState({
+                loading: false,
+            })
+        }, 2000)
+    }
+
+    render() {
+        return <LoadingChild loading={this.state.loading}>parent content</LoadingChild>
+    }
+}
+
+export default Demo;
+
+// hocLoading.js
+import React from 'react';
+export default function HocLoading (WrappedComponent) {
+    class ComponentLoading extends React.Component {
+        render () {
+            const { loading } = this.props;
+            return (
+                loading
+                ? <h4>loading...</h4>
+                : <WrappedComponent {...this.props} />
+            )
+        }
+    }
+    return ComponentLoading;
+}
+
+// Child.jsx
+import React from 'react';
+
+class Child extends React.Component {
+    render() {
+        return <>
+            <h1>This is Content!</h1>
+            <div>{this.props.children}</div>
+        </>
+    }
+}
+
+export default Child;
+```
+### **80. 如何用React实现滚动动画？
+### 81. 说出几点你认为的React最佳实践
+1. 合理的精细化组件，避免单个组件文件的代码行数过长
+2. 像后台管理这种通用型比较强的界面，可以把相同的逻辑抽离成业务hook
+3. 状态组件和无状态组件分离，状态组件做逻辑的处理，无状态组件只是一个纯函数，做纯粹的展示
+4. 为了性能的考虑，尽量使用函数式组件
+5. 使用React.PureComponent React.memo useMemo useCallback等结合使用，优化组件更新时的渲染性能
+### 82. 你是如何划分React组件的？
+* layout: 结构性的展示型组件，一般是无状态的，如header、footer等
+* components: 公用的组件，既有props的传入，内部也有自己的state进行处理
+* pages: 页面级组件，有状态组件，通过调用上面两种类型的组件，传入相应的props，一般与路由挂在一下，逻辑上会进行ajax请求等副作用操作
+### 83. 举例说明如何在React创建一个事件
+```jsx
+const Demo = () => {
+    const handleClick = () => {
+        // 事件处理代码
+    }
+    return <button onClick={handleClick}>add</button>
+}
+```
+### 84. 如何更新组件的状态？
+state的变化，即`this.setState`，还有props的变化，都会引起re-render，diffDOM之后，如果两次渲染的VNODE有差异，就会引起组件的更新。
+### 85. 怎样将多个组件嵌入到一个组件中？
+(没明白问什么)
+### 86. React的render中可以写{if else}这样的判断吗？
+不能。jsx中只能写js表达式，不能写js语句。
+关于js表达式和js语句的区别：语句是为了进行某种操作，一般情况下不需要返回值，而表达式都是为了得到返回值，一定会返回一个值（这里的值不包括undefined）；写之前可以想象jsx中的js代码是否能够放在`if()`中，如果可以，就可以放在jsx中。
+### 87. React为什么要搞一个Hooks？
+降低耦合，提高代码的复用性。同时给函数式组件赋予了状态，class组件能做的事情，几乎都可以用函数式组件来实现，提高性能。
+在传统的class组件中，UI和逻辑是绑定在一起的，虽然可以通过hoc的方式进行抽离，但是hoc这种方式并不直观，理解成本较大，hook则解决了这一问题，hooks的书写方式，代码简单明了，复用行极强，通过hooks提供的`useState`实现了数据的响应，同时通过`useEffect`，又实现了对各生命周期的模拟，大大加强了hooks的功能性。
+### 88. React Hooks帮我们解决了哪些问题？
+见[第87题](#87-React为什么要搞一个Hooks？)
+### **89. 使用React的memo和forwardRef包装的组件为什么提示children类型不对？
+### 90. 有在项目中使用过Antd吗？说说它的好处
+使用过。
+好处：
+* 统一精美的UI
+* 大量现成高质量的基础组件，丰富的API，方便快速开发
+* tree-shaking，实现了按需加载，减少代码体积
+* 活跃的社区氛围，周边组件也比较丰富
 
