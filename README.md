@@ -774,18 +774,79 @@ class Component extends React.Component {
 ### 60. 你最喜欢React的哪一个特性（说一个就好）？
 Hooks.可以对代码进行解耦，更优雅、直观的拆分和复用代码。
 ### 61. 在React中什么时候使用箭头函数更方便呢？
+* 事件函数需要传参
+* class组件中需要绑定事件的`this`，可以使用`public class fields`语法，用箭头函数的方式定义一个函数是类的属性
 ### 62. 你最不喜欢React的哪一个特性（说一个就好）？
-### 63. 说说你对React的reconciliation（一致化算法）的理解
-### 64. 使用PropTypes和Flow有什么区别？
+* CSS的方案还有缺陷，利用css module可以解决css作用域的问题，但是在代码调试上因为浏览器的类名和代码类名不一致，所以并不直观。
+### **63. 说说你对React的reconciliation（一致化算法）的理解
+### **64. 使用PropTypes和Flow有什么区别？
 ### 65. 怎样有条件地渲染组件？
+（同[第56题](#56-写个例子说明什么是JSX的内联条件渲染)）
 ### 66. 在JSX中如何写注释？
+注释属于js语法层面的代码，所以jsx中的注释需要用`{ }`包住，且仅支持`/* */`这种注释的形式，如下：
+```jsx
+const Demo = () => (
+    <div>
+        {/* 注释内容 */}
+        <span>
+            123
+        </span>
+    </div>
+);
+```
 ### 67. constructor和getInitialState有不同？
+constructor是生命周期的第一步，用于做一些初始化的工作，比如state的初始值，事件this的绑定等。
+(getInitialState是老API了，不用了解)
 ### 68. 写例子说明React如何在JSX中实现for循环
+```JSX
+const Demo = () => {
+    const list = [1,2,3];
+    return (
+        <ul>
+            { list.map(e => <li key={e}>{e}</li>) }
+        </ul>
+    )
+}
+```
 ### 69. 为什么建议Fragment包裹元素？它的简写是什么？
+动机：jsx表达式必须用一个父元素把它们包起来，Fragments用于一个组件返回多个自元素列表的情况，需要用`<React.Fragment>`把它们包起来
+简写：`<>{ReactNodeList}</>`，注意简写不能加上`key`属性，只有`<React.Fragment>`的写法才可以
 ### 70. 你有用过React.Fragment吗？说说它有什么用途？
+有用过。jsx表达式必须用一个父元素把它们包起来，Fragments用于一个组件返回多个自元素列表的情况，需要用`<React.Fragment>`把它们包起来
 ### 71. 在React中你有遇到过安全问题吗？怎么解决？
+* XXS攻击：使用了`dangerouslySetInnerHtml`属性，可以直接调用浏览器原生的`innerHTML`接口，设置富文本，可能会导致XXS攻击的问题，所以需要对用户设置的内容进行过滤
 ### 72. React中如何监听state的变化？
+可以使用ES6 class中的getter属性，代码示例如下
+```jsx
+import React from 'react';
+class Demo extends React.Component {
+    state = {
+        count: 1
+    }
+
+    get cp_state() {
+        return this.state.count * 2;
+    }
+
+    handleAdd = () => {
+        this.setState(prevState => ({
+            count: prevState.count + 1,
+        }));
+    }
+
+    render () {
+        return <React.Fragment>
+            <h1>{this.state.count}</h1>
+            <h1>{this.cp_state}</h1>
+            <button onClick={this.handleAdd}>ADD</button>
+        </React.Fragment>
+    }
+}
+export default Demo;
+```
 ### 73. React什么是有状态组件？
+状态即是React中的state，有状态组件就是React组件中有state在维护的组件，在Hooks之前，一般class组件都是有状态组件(如果只用props，也是无状态组件)，Functional组件都是无状态组件，
 ### 74. React v15中怎么处理错误边界？
-### 75. React Fiber它的目的是解决什么问题？
+(过时的API，无需关注，最新的错误边界处理可以参考[第26题](#26-React中在哪捕获错误？)
+### **75. React Fiber它的目的是解决什么问题？
 
