@@ -1099,18 +1099,117 @@ class组件：state的变化，即`this.setState`，还有props的变化，都�
 * tree-shaking，实现了按需加载，减少代码体积
 * 活跃的社区氛围，周边组件也比较丰富
 
-### 91. 在React中如果去除生产环境上的sourcemap？
+### 91. 在React中如何去除生产环境上的sourcemap？
+create-react-app脚手架中,使用了`build`命令后，生产环境中的代码就已经去除了sourcemap了。本质上来说，是否sourcemap都是webpack来进行配置的，webpack中的devtool选项来控制sourcemap的类型，如果要去除source，则省略devtool选项
 ### 92. 在React中怎么引用sass或less？
+利用webpack，引入sass-loader或者less-loader,并根据样式文件的后缀名，在webpack中进行rule的配置，配置完成了，webpack则会正确的解析sass何less文件。
 ### 93. 组件卸载前，加在DOM元素的监听事件和定时器要不要手动清除？为什么？
+要。一般在`componentWillUnMount`或者是函数式组件的`useEffect`函数的返回函数中进行清除动作。
+因为，无论是事件的监听、定时器操作都不回随着组件的卸载而清除，如果不手动进行清除的话，会一直占用浏览器的内存，有内存泄漏的风险
 ### 94. 为什么标签里的for要写成htmlFor呢？
+jsx是在js中的，`for`是js中的关键字，所以改成了`htmlFor`
 ### 95. 状态管理器解决了什么问题？什么时候用状态管理器？
+状态管理器解决的问题
+1. 让组件的通信不再局限于通过props父传子这种模式，可以在任意组件间进行传递
+2. 数据状态与UI组件分离，减少耦合
+3. 状态管理器的各种库，往往限制了数据操作的方法（如Redux只能通过`dispatch`操作数据），确保数据的操作流向，利于问题的排查
+什么时候使用，见[第1题](#1-什么时候使用状态管理器？)
 ### 96. 状态管理器它精髓是什么？
+* 数据从各种UI组件中抽离，数据可以注入到各层级的组件
+* 通过react-redux、mobx-react等中间库，让数据响应UI的变化
+* 限制数据的操作方式，确保数据的流向
 ### 97. 函数式组件有没有生命周期？为什么？
+v16.8前，没有，那时候的函数式组件就是无状态组件，只用在简单的数据展示。
+v16.8之后，随着hooks的引入，函数式组件也是有生命周期了，用useEffect函数就可以模拟，下面是各生命周期用useEffect函数的实现
+```jsx
+import { useRef, useEffect, useState } from "react";
+
+function useMount (fn) {
+    useEffect(fn, []);
+}
+
+function useUpdate (fn) {
+    const isFirst = useRef(true);
+    useEffect(() => {
+        if (isFirst.current) {
+            isFirst.current = false;
+            return;
+        }
+        fn();
+    })
+}
+
+function useUnMount (fn) {
+    useEffect(() => {
+        return fn;
+    }, [])
+}
+
+const TComponent = props => {
+    useMount(() => {
+        console.log('componentDidMount');
+    });
+    useUpdate(() => {
+        console.log('componentDidUpdate');
+    });
+    useUnMount(() => {
+        console.log('componentWillUnMount');
+    });
+    return <h1>TComponent: {props.children}</h1>
+}
+
+const Demo = () => {
+    const [visible, setVisible] = useState(true);
+    const [count, setCount] = useState(0);
+    return <>
+        <button onClick={() => { setVisible(!visible) }}>Toggle</button>
+        <button onClick={() => { setCount(count + 1) }}>Update</button>
+        { visible && <TComponent>{count}</TComponent> }
+    </>
+}
+
+export default Demo;
+```
 ### 98. 在React中怎么引用第三方插件？比如说jQuery等
-### 99. React的触摸事件有哪几种？
+(这个问题奇怪)
+1. 安装`npm i jquery -S`
+2. 引入`import $ from 'jquery';`
+3. 使用`$(ref)`,注意使用ref的方式引用api，且要在组件挂载到dom之后，才能引用
+### **99. React的触摸事件有哪几种？
+1. onTouchStart
+2. onTouchMove
+3. onTouchEnd
+4. onTouchCancel???
 ### 100. 路由切换时同一组件无法重新渲染的有什么方法可以解决？
-### 101. React16新特性有哪些？
-### 102. 你有用过哪些React的UI库？它们的优缺点分别是什么？
+切换前后给无法重新渲染的组件赋予不同的key
+### **101. React16新特性有哪些？
+1. 内部diff算法用Fiber实现，主要是异步渲染，防止主线程被阻塞
+### **102. 你有用过哪些React的UI库？它们的优缺点分别是什么？
+用过antd。增加开发的便利性，大量可以直接使用的组件。
 ### 103. `<div onClick={handlerClick}>单击</div>`和`<div onClick={handlerClick(1)}>单击</div>`有什么区别？
+onClick后大括号中的表达式的返回值应该是一个函数，本题中，前者`handlerClick`是一个函数，点击div后触发这个方法，是常规的用法；后者`handlerClick(1)`，一开始`handlerClick(1)`就会执行，如果执行后返回值是函数fn，那么点击div后触发的方法是fn.
 ### 104. 在React中如何引入图片？哪种方式更好？
+1. 
+```jsx
+import logo from '@/assets/logo.png'
+const Demo = () => (
+    <div>
+        <img src={logo} />
+    </div>
+)
+```
+2. 
+```jsx
+const Demo = () => (
+    <div>
+        <img src={require('@/assets/logo.png').default} />
+    </div>
+)
+```
+应该都是一样的，都会经过webpack的处理，如果满足webpack的 `url-loader`,`options.limit`的规定值以下，就会把图片转化成base64进行引用
+
 ### 105. 在React中怎么使用字体图标？
+1. 在工程中加入字体文件
+2. 在css文件中`@font-face`定义字体名称、引用字体文件
+3. react工程的入口引入上面的css文件
+4. 在组件的className中添加自定义字体对应的类名即可使用
