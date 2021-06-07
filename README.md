@@ -896,7 +896,7 @@ export default Demo;
 状态即是React中的state，有状态组件就是React组件中有state在维护的组件，在Hooks之前，一般class组件都是有状态组件(如果只用props，也是无状态组件)，Functional组件都是无状态组件，
 ### 74. React v15中怎么处理错误边界？
 (过时的API，无需关注，最新的错误边界处理可以参考[第26题](#26-React中在哪捕获错误？)
-### **75. React Fiber它的目的是解决什么问题？
+### 75. *React Fiber它的目的是解决什么问题？
 React 15 的 StackReconciler 方案由于递归不可中断问题，如果 Diff 时间过长（JS计算时间），会造成页面 UI 的无响应（比如输入框）的表现，vdom 无法应用到 dom 中。
 
 为了解决这个问题，React 16 实现了新的基于 requestIdleCallback 的调度器（因为 requestIdleCallback 兼容性和稳定性问题，自己实现了 polyfill），通过任务优先级的思想，在高优先级任务进入的时候，中断 reconciler。
@@ -976,7 +976,10 @@ class Child extends React.Component {
 
 export default Child;
 ```
-### **80. 如何用React实现滚动动画？
+### 80. *如何用React实现滚动动画？
+1. 监听`window.scroll`事件，在事件回调中监听`document.documentElement.scrollTop`的值`y`
+2. 根据需求，当`y`值到达一定的值时，利用state控制需要动画的目标元素的显隐
+3. 利用`react-transition-group`库控制动画
 ### 81. 说出几点你认为的React最佳实践
 1. 合理的精细化组件，避免单个组件文件的代码行数过长
 2. 像后台管理这种通用型比较强的界面，可以把相同的逻辑抽离成业务hook
@@ -987,8 +990,9 @@ export default Child;
 * layout: 结构性的展示型组件，一般是无状态的，如header、footer等
 * components: 公用的组件，既有props的传入，内部也有自己的state进行处理
 * pages: 页面级组件，有状态组件，通过调用上面两种类型的组件，传入相应的props，一般与路由挂在一下，逻辑上会进行ajax请求等副作用操作
-### **83. 举例说明如何在React创建一个事件
+### 83. 举例说明如何在React创建一个事件
 ```jsx
+/** 原生的javascript也有事件的emit，这里是借用的node的events模块 */
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 var EventEmitter = require('events').EventEmitter;
@@ -1090,7 +1094,8 @@ class组件：state的变化，即`this.setState`，还有props的变化，都�
 在传统的class组件中，UI和逻辑是绑定在一起的，虽然可以通过hoc的方式进行抽离，但是hoc这种方式并不直观，理解成本较大，hook则解决了这一问题，hooks的书写方式，代码简单明了，复用行极强，通过hooks提供的`useState`实现了数据的响应，同时通过`useEffect`，又实现了对各生命周期的模拟，大大加强了hooks的功能性。
 ### 88. React Hooks帮我们解决了哪些问题？
 见[第87题](#87-React为什么要搞一个Hooks？)
-### **89. 使用React的memo和forwardRef包装的组件为什么提示children类型不对？
+### 89. *使用React的memo和forwardRef包装的组件为什么提示children类型不对？
+过去使用Component、FC等类型定义组件时一般不需要我们定义props里children的类型，因为在上述类型里已经帮你默认加上了 { children?: ReactNode } 的定义。但是@types/react的维护者认为这样导致children几乎没有类型约束，组件开发者应该显式地声明children类型。所以对新的API应该都不会自动加上children的定义了，需要开发者手动添加。（[这里](https://github.com/haizlin/fe-interview/issues/844)找的答案，没看懂，说的好像是ts react吧）
 ### 90. 有在项目中使用过Antd吗？说说它的好处
 使用过。
 好处：
@@ -1102,7 +1107,7 @@ class组件：state的变化，即`this.setState`，还有props的变化，都�
 ### 91. 在React中如何去除生产环境上的sourcemap？
 create-react-app脚手架中,使用了`build`命令后，生产环境中的代码就已经去除了sourcemap了。本质上来说，是否sourcemap都是webpack来进行配置的，webpack中的devtool选项来控制sourcemap的类型，如果要去除source，则省略devtool选项
 ### 92. 在React中怎么引用sass或less？
-利用webpack，引入sass-loader或者less-loader,并根据样式文件的后缀名，在webpack中进行rule的配置，配置完成了，webpack则会正确的解析sass何less文件。
+利用webpack，引入node-sass sass-loader或者less-loader,并根据样式文件的后缀名，在webpack中进行rule的配置，配置完成了，webpack则会正确的解析sass何less文件。
 ### 93. 组件卸载前，加在DOM元素的监听事件和定时器要不要手动清除？为什么？
 要。一般在`componentWillUnMount`或者是函数式组件的`useEffect`函数的返回函数中进行清除动作。
 因为，无论是事件的监听、定时器操作都不回随着组件的卸载而清除，如果不手动进行清除的话，会一直占用浏览器的内存，有内存泄漏的风险
@@ -1120,7 +1125,7 @@ jsx是在js中的，`for`是js中的关键字，所以改成了`htmlFor`
 * 限制数据的操作方式，确保数据的流向
 ### 97. 函数式组件有没有生命周期？为什么？
 v16.8前，没有，那时候的函数式组件就是无状态组件，只用在简单的数据展示。
-v16.8之后，随着hooks的引入，函数式组件也是有生命周期了，用useEffect函数就可以模拟，下面是各生命周期用useEffect函数的实现
+v16.8之后，也没有，随着hooks的引入，函数式组件看起来像有生命周期了，用useEffect函数就可以模拟，但是最要抛弃生命周期的概念，useEffect只是处理副作用，下面是模拟各生命周期用useEffect函数的实现
 ```jsx
 import { useRef, useEffect, useState } from "react";
 
@@ -1175,16 +1180,24 @@ export default Demo;
 1. 安装`npm i jquery -S`
 2. 引入`import $ from 'jquery';`
 3. 使用`$(ref)`,注意使用ref的方式引用api，且要在组件挂载到dom之后，才能引用
-### **99. React的触摸事件有哪几种？
+### 99. React的触摸事件有哪几种？
 1. onTouchStart
 2. onTouchMove
 3. onTouchEnd
-4. onTouchCancel???
+4. onTouchCancel：当一些更高级别的事件发生的时候（如电话接入或者弹出信息）会取消当前的touch操作，即触发ontouchcancel
 ### 100. 路由切换时同一组件无法重新渲染的有什么方法可以解决？
 切换前后给无法重新渲染的组件赋予不同的key
 ### **101. React16新特性有哪些？
-1. 内部diff算法用Fiber实现，主要是异步渲染，防止主线程被阻塞
-### **102. 你有用过哪些React的UI库？它们的优缺点分别是什么？
+* 内部diff算法用Fiber实现，主要是异步渲染，防止主线程被阻塞
+* render 支持返回数组和字符串
+* 错误边界
+* Portals
+* React.createContext
+* Profiler
+* Hooks
+* React.lazy
+* React.memo
+### 102. 你有用过哪些React的UI库？它们的优缺点分别是什么？
 用过antd。增加开发的便利性，大量可以直接使用的组件。
 ### 103. `<div onClick={handlerClick}>单击</div>`和`<div onClick={handlerClick(1)}>单击</div>`有什么区别？
 onClick后大括号中的表达式的返回值应该是一个函数，本题中，前者`handlerClick`是一个函数，点击div后触发这个方法，是常规的用法；后者`handlerClick(1)`，一开始`handlerClick(1)`就会执行，如果执行后返回值是函数fn，那么点击div后触发的方法是fn.
