@@ -1227,17 +1227,71 @@ const Demo = () => (
 3. react工程的入口引入上面的css文件
 4. 在组件的className中添加自定义字体对应的类名即可使用
 ### 106. React的应用如何打包发布？它的步骤是什么？
+在使用create-react-app脚手架的工程中，打包的命令是`build`,使用`build`命令进行打包了之后，会在dist中生成打包后的文件，将打包后的文件丢到服务器中指定的目录即可。
 ### 107. ES6的语法'...'在React中有哪些应用？
-### 108. 如何封装一个React的全局公共组件？
+* `this.setState`，设置一个对象时，保持对象是不可变数据，需要用对象的拓展运算符合并就对象的属性，需要修改的目标对象放在最后用以被覆盖
+* Rudex的reducer中需要返回新的state，也要保持对象的不可变数据，返回一个全新的对象
+* props的透传（一般用在hoc中）
+### **108. 如何封装一个React的全局公共组件？
+（我这里理解的全剧公共组件是像Vue一样，使用Vue.component全局注册，React中好像没有类似的方法）
 ### 109. 在React中组件的props改变时更新组件的有哪些方法？
+这题我理解的是props改变导致render历经的生命周期，依次如下：
+1. `static getDerivedStateFromProps`
+2. `shouldComponentUpdate`
+3. `render`
+4. `getSnapshotBeforeUpdate`
+5. `componentDidUpdate`
 ### 110. immutable的原理是什么？
+React判断组件是否更新，在比较state和props时，使用的是浅比较。
+对于引用类型来说，浅比较即`===`,如果直接修改对象的属性，那么对象的引用地址没有发生变化，则不会引起触发react的更新；所以在更新state和props时候，都必须使用immutable数据，保持更新后的数据引用地址是改变了的。
 ### 111. 你对immutable有了解吗？它有什么作用？
+见[第110题](110-immutable的原理是什么？)
 ### 112. 如何提高组件的渲染效率呢？
+* class组件继承React.PureComponent，也可以使用shouldComponentUpdate根据业务判定是否需要更新组件
+* function组件用React.memo hoc一层
+* 在jsx中事件的定义不要用箭头函数
+* 使用useMemo、useCallback缓存数据和函数
+* 是使用Redux时，精细化mapStateToProps的返回值（不要一次性穿过整个state），可以使用reselect缓存selector的数据
 ### 113. 在React中如何避免不必要的render？
+见[第112题](112-如何提高组件的渲染效率呢？)
 ### 114. render在什么时候会被触发？
+见[第4题](4-说说你对React的渲染原理的理解)
 ### 115. 写出React动态改变class切换组件样式
-### 116. React中怎么操作虚拟DOM的Class属性？
+```jsx
+import { useState } from 'react';
+const Demo = () => {
+    const [hidden, setHidden] = useState(false);
+    return <>
+        <h1 class={hidden ? 'hidden' : 'visible'}>hello</h1>
+    </>
+}
+
+// 一般对css class的处理我们都会引入classnames，会更方便
+import { useState } from 'react';
+const Demo = () => {
+    const [hidden, setHidden] = useState(false);
+    return <>
+        <h1 class={classnames({
+            hidden: hidden,
+            visible: !hidden,
+        })}>hello</h1>
+    </>
+}
+```
+### **116. React中怎么操作虚拟DOM的Class属性？
+（这道题问的有点奇怪，没看懂）
 ### 117. 为什么属性使用className而不是class呢？
+jsx本质上还是js语句中的一部分，`class`是js的关键字，不能直接使用
 ### 118. 请说下react组件更新的机制是什么？
+不管是class组件还是函数式组件，React的组件本质上都是函数，从根组件到下面大大小小的子组件，React组件树即构成了函数的嵌套，React的渲染/更新即时从顶层函数执行，一步一步的递归执行内部嵌套函数的过程，这是一个原生的JS执行栈执行的过程。
+在React16之前，这个执行过程是不能够被打断的，会一次性的同步直接完，所以可能会导致事件响应延迟、动画卡顿等性能问题。
+React16之后，随着Fiber机制的引入，这个执行的过变成了异步的，Fiber会按照浏览器原生的requestIdelCallback API对整个执行过程进行时间分片，在每一个时间片内，除了进行react的解析执行之外，同事也会进行动画、事件响应等操作，保持页面的流畅性
 ### 119. 怎么在JSX里属性可以被覆盖吗？覆盖的原则是什么？
+Vue才可以覆盖吧，react不能
 ### 120. 怎么在JSX里使用自定义属性？
+和原生html一样，用`data-`前缀的属性即可
+```jsx
+const Demo = () => <h1 data-age="12">hello<h1>;
+// 可以用以下的原生js方法进行取值
+h1Ele.dataset.age // 12(string)
+```
