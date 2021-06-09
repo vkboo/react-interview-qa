@@ -1465,3 +1465,18 @@ export default Demo;
 (废弃api，不用关心)
 ### 135. React组件命名推荐的方式是哪个？为什么不推荐使用displayName？
 React通过大驼峰的形式命名组件，无论是class组件还是函数式组件，都尽量不要使用匿名导出的方式，这样的话，在devTools上显示的就是类名或函数名，这样也就没必要使用displayName了。
+### 136.React的displayName有什么作用？
+### 137.说说你对React的组件命名规范的理解
+### 138.说说你对React的项目结构的理解
+### 139.React16废弃了哪些生命周期？为什么？
+### 140.怎样在React中开启生产模式？
+### 141.React中getInitialState方法的作用是什么？
+### 142.React中你知道creatClass的原理吗？
+### 143.React中验证props的目的是什么？
+### 144.React中你有使用过getDefaultProps吗？它有什么作用？
+### 145.React中你有使用过propType吗？它有什么作用？
+### 146.React中怎么检验props？
+### 147.React.createClass和extends Component的区别有哪些？
+### 148.高阶组件(HOC)有哪些优点和缺点？
+### 149.给组件设置很多属性时不想一个个去设置有什么办法可以解决这问题呢？
+### 150.React16跟之前的版本生命周期有哪些变化？
