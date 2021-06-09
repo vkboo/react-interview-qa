@@ -1302,9 +1302,28 @@ const Demo = () => <h1 data-age="12">hello<h1>;
 // 可以用以下的原生js方法进行取值
 h1Ele.dataset.age // 12(string)
 ```
-### **121. 怎么防止HTML被转义？
+### 121. 怎么防止HTML被转义？
+React会将所有要显示到DOM的字符串转义，防止XSS。所以，如果JSX中含有转义后的实体字符，比如& copy; (©)，则最后DOM中不会正确显示，因为React中自动把& copy；中的特殊字符转义了。解决办法为：
+1. 直接使用UTF-8字符 ©（在mac中使用 option 或 option+shift，再加其它键就可以快速输入符号
+2. 使用对应字符的Unicode编码；
+3. 使用数组组装
+4. 直接插入原始的HTML。
+```jsx
+const Demo = () => (
+    <>
+        {/* 有问题，显示是 &copy; */}
+        <div>{'&copy;'}</div>
+        {/* 以下的都ok，显示是 © */}
+        <div>{'©'}</div>
+        <div>{'\u00a9'}</div>
+        <div>{[<span>&copy;</span>]}</div>
+        <div dangerouslySetInnerHTML={{__html: '&copy;'}}></div>
+    </>
+);
+```
 ### 122. 经常用React，你知道React的核心思想是什么吗？
-MVVM(Model-View-ViewModel)，从数据到视图的单项数据流，数据的变化会引起视图层的更新
+* MVVM(Model-View-ViewModel)，从数据到视图的单项数据流，数据的变化会引起视图层的更新，一般不会直接操作DOM
+* 组件化，props单项传递
 ### 123. 在React中我们怎么做静态类型检测？都有哪些方法可以做到？
 * 通过第三方的库来做，比如`prop-types`等
 * 通过静态语法检查，比如`typescript``flow`等
@@ -1325,15 +1344,39 @@ state是组件实例中挂载的状态值，setState是组件实例挂载的方�
 4. `this.forceUpdate`,render函数中如果依赖了非`state`和`props`的其它变量，就需要用这个方式强制`render`函数执行
 5. 父组件更新，会导致所有子组件的render方法执行
 ### 127. 什么是React的实例？函数式组件有没有实例？
-针对class组件，React的实例指的是这个Calss的实例，如state、方法都是挂载在这个实例上，组件每引用一起，就会生成一次组件的实例。
+针对class组件，React的实例指的是这个Calss继承`React.Component`所产生的实例，如state、方法都是挂载在这个实例上，组件每引用一起，就会生成一次组件的实例。
 函数式组件不是构造函数的调用模式，本质上只是普通函数，所以没有实例。
-### **128. 在React中如何判断点击元素属于哪一个组件？
-class组件中，在事件处理中的this即是当前点击元素的组件的实例，可以通过这个来判断
+### 128. 在React中如何判断点击元素属于哪一个组件？
+利用ref的api，然后使用原生DOM的`contains`方法进行判断，demo如下
+```jsx
+import React from 'react';
+
+const Child = React.forwardRef((props, ref) => {
+    return <div ref={ref}>
+        <button onClick={props.onClickButton}>aaa</button>
+    </div>
+})
+
+class Demo extends React.Component {
+    childRef = null;
+    handleClick = (e) => {
+        console.log(this.childRef.contains(e.target)); // true
+    }
+    render() {
+        return <>
+            <Child onClickButton={this.handleClick} ref={ref => this.childRef = ref} />
+        </>
+    }
+}
+
+
+export default Demo;
+```
 ### 129. 在React中组件和元素有什么区别？
 * React组件分两种，class组件和函数式组件，它的本质是一个类或者普通函数
-* React元素，render函数的返回值，或者是函数式组件的返回值可以是一个react元素，它是一个`JSX`表达式，本质上是一个对象
+* React元素，render函数的返回值，或者是函数式组件的返回值可以是一个react元素，它是一个`JSX`表达式，本质上是一个对象;利用`React.createElement`,`React.cloneElement`方法的返回值也是React元素
 ### 130. 在React中声明组件时组件名的第一个字母必须是大写吗？为什么？
-是的。因为在html标准中，标签命都是小写中间横杠的命名方式，React为了与其区分，防止与现有或者以后出现的html标签重名，约定采用大驼峰的命名方式
+是的。因为在html标准中，标签命都是小写中间横杠的命名方式，React为了与其区分，防止与现有或者以后出现的html标签重名，约定采用大驼峰的命名方式,Babel在对jsx进行解析时也是以此为规则，首字母是大写即使React组件，否则Babel会识别成普通html标签.
 ### **131. 举例说明什么是高阶组件(HOC)的反向继承？
 ### 132. 有用过React Devtools吗？说说它的优缺点分别是什么？
 用过。
