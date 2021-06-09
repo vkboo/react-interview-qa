@@ -1302,13 +1302,31 @@ const Demo = () => <h1 data-age="12">hello<h1>;
 // 可以用以下的原生js方法进行取值
 h1Ele.dataset.age // 12(string)
 ```
-### 121. 怎么防止HTML被转义？
+### **121. 怎么防止HTML被转义？
 ### 122. 经常用React，你知道React的核心思想是什么吗？
+MVVM(Model-View-ViewModel)，从数据到视图的单项数据流，数据的变化会引起视图层的更新
 ### 123. 在React中我们怎么做静态类型检测？都有哪些方法可以做到？
+* 通过第三方的库来做，比如`prop-types`等
+* 通过静态语法检查，比如`typescript``flow`等
 ### 124. 在React中组件的state和setState有什么区别？
+state是组件实例中挂载的状态值，setState是组件实例挂载的方法，作用是改变state的值，并且通知到view层，引起UI层的刷新，setState是异步的。
 ### 125. React怎样跳过重新渲染？
+1. 针对class组件，使用`React.PureComponent`
+2. 针对函数式组件，使用`React.memo`
+3. 合理的使用`shouldComponentUpdate`函数
+4. 父组件对需要传递的子组件的props，合理使用`useCallback`、`useMemo`的hook,保证props的最小变化
 ### 126. React怎么判断什么时候重新渲染组件呢？
+这里是重新渲染理解成重新渲染DOM的话，React的判断依据是通过render前后，对比两次的虚拟DOM树，如果前后两次的DOM树完全相同，则不会重新渲染，否则会根据两次树的差异，重新渲染部分DOM。
+
+如果重新渲染指的是re-render（即执行render方法）的话，有以下的方法都会使组件re-render
+1. 初始渲染
+2. `this.setState`方法，参数不能为`null`,及时`this.setState({})`,或者`setState`一个相同的值，也会导致render函数的执行
+3. props的改变(采用浅比较)
+4. `this.forceUpdate`,render函数中如果依赖了非`state`和`props`的其它变量，就需要用这个方式强制`render`函数执行
+5. 父组件更新，会导致所有子组件的render方法执行
 ### 127. 什么是React的实例？函数式组件有没有实例？
+针对class组件，React的实例指的是这个Calss的实例，如state、方法都是挂载在这个实例上，组件每引用一起，就会生成一次组件的实例。
+函数式组件不是构造函数的调用模式，本质上只是普通函数，所以没有实例。
 ### 128. 在React中如何判断点击元素属于哪一个组件？
 ### 129. 在React中组件和元素有什么区别？
 ### 130. 在React中声明组件时组件名的第一个字母必须是大写吗？为什么？
