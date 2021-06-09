@@ -1377,7 +1377,49 @@ export default Demo;
 * React元素，render函数的返回值，或者是函数式组件的返回值可以是一个react元素，它是一个`JSX`表达式，本质上是一个对象;利用`React.createElement`,`React.cloneElement`方法的返回值也是React元素
 ### 130. 在React中声明组件时组件名的第一个字母必须是大写吗？为什么？
 是的。因为在html标准中，标签命都是小写中间横杠的命名方式，React为了与其区分，防止与现有或者以后出现的html标签重名，约定采用大驼峰的命名方式,Babel在对jsx进行解析时也是以此为规则，首字母是大写即使React组件，否则Babel会识别成普通html标签.
-### **131. 举例说明什么是高阶组件(HOC)的反向继承？
+### 131. 举例说明什么是高阶组件(HOC)的反向继承？
+```jsx
+import React from 'react';
+class Person extends React.Component {
+    state = {
+        name: 'vk',
+        age: 12,
+    }
+    componentDidMount () {
+        console.log('mounted')
+    }
+    render () {
+        const { name, age } = this.state;
+        return <div>
+            <div>名字: {name}</div>
+            <div>年龄: {age}</div>
+            <div>props#count: {this.props.count}</div>
+        </div>
+    }
+}
+
+const hoc = WrappedComponent => class HocComponent extends WrappedComponent {
+    // state和生命周期还有其它的方法都会进行完全的复写
+    state = {
+        name: 'bo',
+        age: 21,
+    }
+    componentDidMount () {
+        console.log('hoc mounted')
+    }
+    render () {
+        return (
+            <div>
+                <p>高阶组件</p>
+                { super.render() }
+            </div>
+        )
+    }
+}
+const HocPerson = hoc(Person);
+const Demo = () => <HocPerson count={111} />
+export default Demo;
+```
 ### 132. 有用过React Devtools吗？说说它的优缺点分别是什么？
 用过。
 
@@ -1390,7 +1432,35 @@ export default Demo;
 缺点: 
 * 对于hooks的支持不太好，无法直观的看出hooks的值
 ### **133. 举例说明什么是高阶组件(HOC)的属性代理？
-见[第79题](79-使用高阶组件(HOC)实现一个loading组件)，使用react hoc实现loading组件就是一个用HOC的属性代理
+```jsx
+/** 比如修改第三方库 antd，把Button组件的loading属性，改成wait */
+import React from 'react';
+import { Button } from 'antd';
+const hoc = WrappedComponent => {
+    class HocComponent extends React.Component {
+        render () {
+            const { forwardRef, wait, ...rest } = this.props;
+            const newProps = {
+                ...rest,
+                loading: wait,
+            }
+            return <Button ref={forwardRef} {...newProps}  />
+        }
+    }
+    return React.forwardRef((props, ref) => {
+        return <HocComponent forwardRef={ref} {...props} />
+    })
+}
+
+const NewButton = hoc(Button);
+
+const Demo = () => {
+    // loading的prop已经不生效了，用wait代替
+    return <NewButton wait={true}>你好</NewButton>
+}
+
+export default Demo;
+```
 ### 134. React的isMounted有什么作用？
 (废弃api，不用关心)
 ### 135. React组件命名推荐的方式是哪个？为什么不推荐使用displayName？
