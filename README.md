@@ -1466,17 +1466,60 @@ export default Demo;
 ### 135. React组件命名推荐的方式是哪个？为什么不推荐使用displayName？
 React通过大驼峰的形式命名组件，无论是class组件还是函数式组件，都尽量不要使用匿名导出的方式，这样的话，在devTools上显示的就是类名或函数名，这样也就没必要使用displayName了。
 ### 136. React的displayName有什么作用？
+方便React调试工具devtools中components对组件名称的显示，方便调试。
 ### 137. 说说你对React的组件命名规范的理解
+React组件的命名需要采用大驼峰的命名规范。因为HTML标签的标准是小写字母，中间间隔横杠的形式，React组件都是自定义组件，为了与其区分开来，采用了大驼峰的命名规范；同事Babel在解析JSX时也是通过这个规则，遇到大驼峰的就识别成React组件，小写字母中间横杠的就是html标签。
 ### 138. 说说你对React的项目结构的理解
-### 139. React16废弃了哪些生命周期？为什么？
+见[第23题](23-React如果进行代码拆分？拆分的原则是什么？)
+### 139. *React16废弃了哪些生命周期？为什么？
+废弃的生命周期有：`componentWillMount`、`componentWillReceiveProps`、`componentWillUpdate`
+原因：因为React引入了Fiber机制，上述提到的生命周期可能会执行多次
 ### 140. 怎样在React中开启生产模式？
+* `npm run build`
+* 使用`cross-env`，把`NODE_ENV`改成`production`
 ### 141. React中getInitialState方法的作用是什么？
+(废弃API，作用与class组件中的constructor类似，不用关注)
 ### 142. React中你知道creatClass的原理吗？
+(废弃API，不用关注)
 ### 143. React中验证props的目的是什么？
+* 提高代码的健壮性
+* 如果使用flow、typescript进行验证，还可以有编辑器的提示
 ### 144. React中你有使用过getDefaultProps吗？它有什么作用？
+用过，它是组件的静态数据，给组件的props赋予默认值
 ### 145. React中你有使用过propType吗？它有什么作用？
+用过，用于限定组件各props属性的类型与是否是必填，提高组件的健壮性
 ### 146. React中怎么检验props？
+使用组件的静态属性`propTyps`,demo如下
+```jsx
+import React from 'react';
+import PropTypes from 'prop-types';
+class Child extends React.Component {
+    static propTypes = {
+        onClickButton: PropTypes.func.isRequired,
+    }
+    render () {
+        return <button onClick={this.props.onClickButton}>aaa</button>
+    }
+}
+class Demo extends React.Component {
+    handleClick = (e) => {
+        console.log('CLICK ME');
+    }
+    render() {
+        return <>
+            <Child onClickButton={this.handleClick} />
+        </>
+    }
+}
+export default Demo;
+```
 ### 147. React.createClass和extends Component的区别有哪些？
+(过时API，不用关注)
 ### 148. 高阶组件(HOC)有哪些优点和缺点？
+优点：
+* 提取组件的功能
+
+缺点
+* 如果形成组件嵌套地狱，对调试不方便
 ### 149. 给组件设置很多属性时不想一个个去设置有什么办法可以解决这问题呢？
 ### 150. React16跟之前的版本生命周期有哪些变化？
