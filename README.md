@@ -1560,3 +1560,18 @@ const Demo = () => {
 * 去掉了`componentWillReceiveProps`,加上了静态方法`getDerivedStateFromProps`代码，用于派生state
 * 去掉了`componentWillUpdate`
 * 加上了方法`getSnapshotBeforeUpdate`，用于更新后UI DOM的处理
+### 151. 怎样实现React组件的记忆？原理是什么？
+### 152. 创建React动画有哪些方式？
+### 153. 为什么建议不要过渡使用Refs？
+### 154. 在React使用高阶组件(HOC)有遇到过哪些问题？如何解决？
+### 155. 在使用React过程中什么时候用高阶组件(HOC)？
+### 156. 说说React diff的原理是什么？
+### 157. React怎么提高列表渲染的性能？
+### 158. 使用ES6的class定义的组件不支持mixins了，那用什么可以替代呢？
+### 159. 为何说虚拟DOM会提高性能？
+### 160. React的性能优化在哪个生命周期？它优化的原理是什么？
+### 161. 你知道的React性能优化有哪些方法？
+### 162. 举例说明在React中怎么使用样式？
+### 163. React有哪几种方法来处理表单输入？
+### 164. 什么是浅层渲染？
+### 165. 你有做过React的单元测试吗？如果有，用的是哪些工具？怎么做的？
