@@ -1517,9 +1517,27 @@ export default Demo;
 (过时API，不用关注)
 ### 148. 高阶组件(HOC)有哪些优点和缺点？
 优点：
-* 提取组件的功能成独立的函数
-
+* 提取组件的功能成独立的HOC函数，增强复用性
+* 通过让HOC对组件进行层层包装，即可往组件中叠加功能
+* 不侵入原组件的代码
 缺点
 * 如果形成组件嵌套地狱，对调试不方便
 ### 149. 给组件设置很多属性时不想一个个去设置有什么办法可以解决这问题呢？
+使用对象拓展运算符，demo如下
+```jsx
+const Demo = () => {
+    const props = {
+        a: 1,
+        b: 2,
+        c: 3,
+        d: 4,
+        e: 5,
+    }
+    return <TComponent {...props} />
+}
+```
 ### 150. React16跟之前的版本生命周期有哪些变化？
+* 去掉了`componentWillMount`
+* 去掉了`componentWillReceiveProps`,加上了静态方法`getDerivedStateFromProps`代码，用于派生state
+* 去掉了`componentWillUpdate`
+* 加上了方法`getSnapshotBeforeUpdate`，用于更新后UI DOM的处理
