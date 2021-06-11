@@ -1465,18 +1465,158 @@ export default Demo;
 (废弃api，不用关心)
 ### 135. React组件命名推荐的方式是哪个？为什么不推荐使用displayName？
 React通过大驼峰的形式命名组件，无论是class组件还是函数式组件，都尽量不要使用匿名导出的方式，这样的话，在devTools上显示的就是类名或函数名，这样也就没必要使用displayName了。
-### 136.React的displayName有什么作用？
-### 137.说说你对React的组件命名规范的理解
-### 138.说说你对React的项目结构的理解
-### 139.React16废弃了哪些生命周期？为什么？
-### 140.怎样在React中开启生产模式？
-### 141.React中getInitialState方法的作用是什么？
-### 142.React中你知道creatClass的原理吗？
-### 143.React中验证props的目的是什么？
-### 144.React中你有使用过getDefaultProps吗？它有什么作用？
-### 145.React中你有使用过propType吗？它有什么作用？
-### 146.React中怎么检验props？
-### 147.React.createClass和extends Component的区别有哪些？
-### 148.高阶组件(HOC)有哪些优点和缺点？
-### 149.给组件设置很多属性时不想一个个去设置有什么办法可以解决这问题呢？
-### 150.React16跟之前的版本生命周期有哪些变化？
+### 136. React的displayName有什么作用？
+方便React调试工具devtools中components对组件名称的显示，方便调试。
+### 137. 说说你对React的组件命名规范的理解
+React组件的命名需要采用大驼峰的命名规范。因为HTML标签的标准是小写字母，中间间隔横杠的形式，React组件都是自定义组件，为了与其区分开来，采用了大驼峰的命名规范；同事Babel在解析JSX时也是通过这个规则，遇到大驼峰的就识别成React组件，小写字母中间横杠的就是html标签。
+### 138. 说说你对React的项目结构的理解
+见[第23题](23-React如果进行代码拆分？拆分的原则是什么？)
+### 139. React16废弃了哪些生命周期？为什么？
+废弃的生命周期有：`componentWillMount`、`componentWillReceiveProps`、`componentWillUpdate`
+原因：因为React引入了Fiber机制，上述提到的生命周期可能会执行多次，不再是一次执行，失去了意义
+### 140. 怎样在React中开启生产模式？
+* `npm run build`
+* 使用`cross-env`，把`NODE_ENV`改成`production`
+* 使用`DefinePlugin`插件，把`NODE_ENV`改成`production`
+### 141. React中getInitialState方法的作用是什么？
+(废弃API，作用与class组件中的constructor类似，不用关注)
+### 142. React中你知道creatClass的原理吗？
+(废弃API，不用关注)
+### 143. React中验证props的目的是什么？
+* 提高代码的健壮性，避免运行时报错，减少不可预见的错误
+* 如果使用flow、typescript进行验证，还可以有编辑器的提示
+### 144. React中你有使用过getDefaultProps吗？它有什么作用？
+(过时API，同组件的静态属性`defaultProps`, 它是组件的静态数据，给组件的props赋予默认值)
+### 145. React中你有使用过propType吗？它有什么作用？
+用过，用于限定组件各props属性的类型与是否是必填，提高组件的健壮性，避免运行时报错
+### 146. React中怎么检验props？
+使用组件的静态属性`propTypes`,demo如下
+```jsx
+import React from 'react';
+import PropTypes from 'prop-types';
+class Child extends React.Component {
+    static propTypes = {
+        onClickButton: PropTypes.func.isRequired,
+    }
+    render () {
+        return <button onClick={this.props.onClickButton}>aaa</button>
+    }
+}
+class Demo extends React.Component {
+    handleClick = (e) => {
+        console.log('CLICK ME');
+    }
+    render() {
+        return <>
+            <Child onClickButton={this.handleClick} />
+        </>
+    }
+}
+export default Demo;
+```
+
+同时，也可以使用静态typescript中泛型的特性，进行校验，如下
+```jsx
+import React, { FC } from 'react';
+/**
+ * 声明Props类型
+ */
+export interface MyComponentProps {
+  className?: string;
+  style?: React.CSSProperties;
+}
+
+export const MyComponent: FC<MyComponentProps> = props => {
+  return <div>hello react</div>;
+};
+```
+### 147. React.createClass和extends Component的区别有哪些？
+(过时API，不用关注)
+### 148. 高阶组件(HOC)有哪些优点和缺点？
+优点：
+* 提取组件的功能成独立的HOC函数，增强复用性
+* 通过让HOC对组件进行层层包装，即可往组件中叠加功能
+* 不侵入原组件的代码
+缺点
+* 如果形成组件嵌套地狱，对调试不方便
+* 组件多层嵌套，增加复杂度与理解成本
+* ref隔断(React.forwardRef 来解决)
+### 149. 给组件设置很多属性时不想一个个去设置有什么办法可以解决这问题呢？
+使用对象拓展运算符，demo如下
+```jsx
+const Demo = () => {
+    const props = {
+        a: 1,
+        b: 2,
+        c: 3,
+        d: 4,
+        e: 5,
+    }
+    return <TComponent {...props} />
+}
+```
+### 150. React16跟之前的版本生命周期有哪些变化？
+* 去掉了`componentWillMount`
+* 去掉了`componentWillReceiveProps`,加上了静态方法`getDerivedStateFromProps`代码，用于派生state
+* 去掉了`componentWillUpdate`
+* 加上了方法`getSnapshotBeforeUpdate`，用于更新后UI DOM的处理
+### 151. 怎样实现React组件的记忆？原理是什么？
+React组件的记忆，这里我理解的是避免React的无效渲染。
+组件渲染的条件之一是对各个props进行浅比较（===），如果更新前后props改变，则会重新渲染。
+所以可以从这个方面入手。这主要针对的是引用数据类型的props进行优化，如果更新前后props的地址没有变化则可以避免组件的渲染。可以使用`useCallback`、`useMemo`Hooks，在Redux的使用中，可以引入`reselect`对selector进行管理，则可以对传入的props进行缓存
+### 152. 创建React动画有哪些方式？
+* 利用`react-transition-group`库
+### 153. 为什么建议不要过渡使用Refs？
+在JSX中使用Refs可以引用到真实的DOM，也可以引用到class组件的实例。针对前者，React作为MVVM框架，应当让数据推动UI进行更新，尽量不要操作DOM，破坏代码的一致性；针对后者，组件间的练习应当尽量使用数据（state+props+Context）来进行交互，避免直接调用组件的方法，增加调试与维护成本。
+### 154. *在React使用高阶组件(HOC)有遇到过哪些问题？如何解决？
+* ref隔断：可以在hoc函数中返回一个`React.forwardRef`函数包裹的组件解决
+### 155. 在使用React过程中什么时候用高阶组件(HOC)？
+* 组件有公共的逻辑可以进行抽离(如提取`ajax`的逻辑)
+* 对某一组件有特殊改动，但是又不能通过直接改动组件的代码，可以通过HOC反向继承的方式重写组件
+* HOC函数实现一独立的功能，可以作用与所有的组件（如`connect`、`withRouter`）
+### 156. 说说React diff的原理是什么？
+* 两个不同类型的元素会产生不同的树
+    - 对比不同类型的元素时，React对卸载掉整个元素以及其子元素，用新的元素来替代
+    - 对比相同类型的元素时，React会保持元素不变，仅更新组件中改变了的属性，处理完成之后，继续递归对子节点进行比较
+    - 对比同类型的组件时，组件的实例会保持不变，因为可以保持state的不变，React将更新props，触发组件更新相关的生命周期
+* 通过开发者给组件制定`key`属性，来告知渲染哪些子元素在不同的渲染下可以保持不变
+    - `key`属性解决的就是列表在进行一对一比较的过程中，新元素树，从中间或者顶部插入的问题；例如，从顶部插入，那么react一对一的往下比较，那么每次比较都是不相同的，react会重建每一个元素；指定了key值之后，react会按照key值进行比较，react就会知道原有的列表只是往下移动了而已，创建的元素只有顶部的一个
+### 157. React怎么提高列表渲染的性能？
+* 对同级的列表元素指定唯一的`key`值
+* 针对大量的列表内容使用虚拟列表
+### 158. 使用ES6的class定义的组件不支持mixins了，那用什么可以替代呢？
+(minins是过时API，React中hoc、Hooks均可以实现比mixins更优的解决方案)
+### 159. 为何说虚拟DOM会提高性能？
+浏览器中的DOM操作比较好性能，单纯的运行JS是比较快的。
+虚拟DOM本质上就是JavaScript对象，在进行React Diff的时候，是针对js对象进行比较，对比除了新旧虚拟DOM的差异之后，再批量更新到浏览器DOM上。因为是js对象的比较，所以会提高性能
+### 160. React的性能优化在哪个生命周期？它优化的原理是什么？
+`shouldComponentUpdate`.根据业务需求比较新旧props，如果返回false，则不会执行render函数，即阻止了React内部对vnode的比较，这样就减少了性能损耗
+### 161. 你知道的React性能优化有哪些方法？
+1. 针对class组件，使用`React.PureComponent`
+2. 针对函数式组件，使用`React.memo`
+3. 合理的使用`shouldComponentUpdate`函数
+4. 父组件对需要传递的子组件的props，合理使用`useCallback`的hook
+5. 合理的拆分组件：组件粒度更细，避免大组件的渲染
+### 162. 举例说明在React中怎么使用样式？
+```jsx
+// 一般
+const Demo = () => <h1 classNames="title">demo</h1>
+
+// classnames
+import classnames from 'classnames';
+const Demo = () => <h1 classNames={classnames('title')}>demo</h1>
+
+// css-in-js styled-components
+
+import styled from 'styled-components';
+const H1 = styled.h1`
+    color: #333;
+`
+const Demo = () => <H1>demo</H1>
+```
+### 163. React有哪几种方法来处理表单输入？
+* 受控组件的处理 
+* 非受控组件的处理
+### **164. 什么是浅层渲染？
+### 165. 你有做过React的单元测试吗？如果有，用的是哪些工具？怎么做的？
+(没做过😅)
