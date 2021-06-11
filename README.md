@@ -1568,15 +1568,52 @@ React组件的记忆，这里我理解的是避免React的无效渲染。
 * 利用`react-transition-group`库
 ### 153. 为什么建议不要过渡使用Refs？
 在JSX中使用Refs可以引用到真实的DOM，也可以引用到class组件的实例。针对前者，React作为MVVM框架，应当让数据推动UI进行更新，尽量不要操作DOM，破坏代码的一致性；针对后者，组件间的练习应当尽量使用数据（state+props+Context）来进行交互，避免直接调用组件的方法，增加调试与维护成本。
-### 154. 在React使用高阶组件(HOC)有遇到过哪些问题？如何解决？
+### 154. *在React使用高阶组件(HOC)有遇到过哪些问题？如何解决？
+* ref隔断：可以在hoc函数中返回一个`React.forwardRef`函数包裹的组件解决
 ### 155. 在使用React过程中什么时候用高阶组件(HOC)？
+* 组件有公共的逻辑可以进行抽离(如提取`ajax`的逻辑)
+* 对某一组件有特殊改动，但是又不能通过直接改动组件的代码，可以通过HOC反向继承的方式重写组件
+* HOC函数实现一独立的功能，可以作用与所有的组件（如`connect`、`withRouter`）
 ### 156. 说说React diff的原理是什么？
+* 两个不同类型的元素会产生不同的树
+    - 对比不同类型的元素时，React对卸载掉整个元素以及其子元素，用新的元素来替代
+    - 对比相同类型的元素时，React会保持元素不变，仅更新组件中改变了的属性，处理完成之后，继续递归对子节点进行比较
+    - 对比同类型的组件时，组件的实例会保持不变，因为可以保持state的不变，React将更新props，触发组件更新相关的生命周期
+* 通过开发者给组件制定`key`属性，来告知渲染哪些子元素在不同的渲染下可以保持不变
+    - `key`属性解决的就是列表在进行一对一比较的过程中，新元素树，从中间或者顶部插入的问题；例如，从顶部插入，那么react一对一的往下比较，那么每次比较都是不相同的，react会重建每一个元素；指定了key值之后，react会按照key值进行比较，react就会知道原有的列表只是往下移动了而已，创建的元素只有顶部的一个
 ### 157. React怎么提高列表渲染的性能？
+* 对同级的列表元素指定唯一的`key`值
+* 针对大量的列表内容使用虚拟列表
 ### 158. 使用ES6的class定义的组件不支持mixins了，那用什么可以替代呢？
+(minins是过时API，React中hoc、Hooks均可以实现比mixins更优的解决方案)
 ### 159. 为何说虚拟DOM会提高性能？
+浏览器中的DOM操作比较好性能，单纯的运行JS是比较快的。
+虚拟DOM本质上就是JavaScript对象，在进行React Diff的时候，是针对js对象进行比较，对比除了新旧虚拟DOM的差异之后，再批量更新到浏览器DOM上。因为是js对象的比较，所以会提高性能
 ### 160. React的性能优化在哪个生命周期？它优化的原理是什么？
+`shouldComponentUpdate`.根据业务需求比较新旧props，如果返回false，则不会执行render函数，即阻止了React内部对vnode的比较，这样就减少了性能损耗
 ### 161. 你知道的React性能优化有哪些方法？
+1. 针对class组件，使用`React.PureComponent`
+2. 针对函数式组件，使用`React.memo`
+3. 合理的使用`shouldComponentUpdate`函数
+4. 父组件对需要传递的子组件的props，合理使用`useCallback`的hook
+5. 合理的拆分组件：组件粒度更细，避免大组件的渲染
 ### 162. 举例说明在React中怎么使用样式？
+```jsx
+// 一般
+const Demo = () => <h1 classNames="title">demo</h1>
+
+// classnames
+import classnames from 'classnames';
+const Demo = () => <h1 classNames={classnames('title')}>demo</h1>
+
+// css-in-js styled-components
+
+import styled from 'styled-components';
+const H1 = styled.h1`
+    color: #333;
+`
+const Demo = () => <H1>demo</H1>
+```
 ### 163. React有哪几种方法来处理表单输入？
 ### 164. 什么是浅层渲染？
 ### 165. 你有做过React的单元测试吗？如果有，用的是哪些工具？怎么做的？
