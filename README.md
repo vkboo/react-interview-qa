@@ -1561,8 +1561,13 @@ const Demo = () => {
 * 去掉了`componentWillUpdate`
 * 加上了方法`getSnapshotBeforeUpdate`，用于更新后UI DOM的处理
 ### 151. 怎样实现React组件的记忆？原理是什么？
+React组件的记忆，这里我理解的是避免React的无效渲染。
+组件渲染的条件之一是对各个props进行浅比较（===），如果更新前后props改变，则会重新渲染。
+所以可以从这个方面入手。这主要针对的是引用数据类型的props进行优化，如果更新前后props的地址没有变化则可以避免组件的渲染。可以使用`useCallback`、`useMemo`Hooks，在Redux的使用中，可以引入`reselect`对selector进行管理，则可以对传入的props进行缓存
 ### 152. 创建React动画有哪些方式？
+* 利用`react-transition-group`库
 ### 153. 为什么建议不要过渡使用Refs？
+在JSX中使用Refs可以引用到真实的DOM，也可以引用到class组件的实例。针对前者，React作为MVVM框架，应当让数据推动UI进行更新，尽量不要操作DOM，破坏代码的一致性；针对后者，组件间的练习应当尽量使用数据（state+props+Context）来进行交互，避免直接调用组件的方法，增加调试与维护成本。
 ### 154. 在React使用高阶组件(HOC)有遇到过哪些问题？如何解决？
 ### 155. 在使用React过程中什么时候用高阶组件(HOC)？
 ### 156. 说说React diff的原理是什么？
