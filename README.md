@@ -1621,3 +1621,18 @@ const Demo = () => <H1>demo</H1>
 （React测试方面的知识）
 ### **165. 你有做过React的单元测试吗？如果有，用的是哪些工具？怎么做的？
 (没做过😅)
+### 166. 在React中什么是合成事件？有什么用？
+### 167. 使用React写一个todo应用，说说你的思路
+### 168. React16的reconciliation和commit分别是什么？
+### 169. React的函数式组件有没有生命周期？
+### 170. useState和this.state的区别是什么？
+### 171. 请说说什么是useImperativeHandle？
+### 172. 请说说什么是useReducer？
+### 173. 请说说什么是useRef？
+### 174. 请说说什么是useEffect？
+### 175. 举例说明useState
+### 176. 请说说什么是useState？为什么要使用useState？
+### 177. 请描述下你对React的新特性Hooks的理解？它有哪些应用场景？
+### 178. 说说你对Error Boundaries的理解
+### 179. 说说你对Fiber架构的理解
+### 180. 说说你是怎么理解React的业务组件和技术组件的？
