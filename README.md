@@ -1622,14 +1622,288 @@ const Demo = () => <H1>demo</H1>
 ### **165. 你有做过React的单元测试吗？如果有，用的是哪些工具？怎么做的？
 (没做过😅)
 ### 166. 在React中什么是合成事件？有什么用？
+在React中定义的事件，都不是原生的DOM事件，而是由react库内部再次封装的合成事件。
+部分合成事件在表现上与与原生DOM事件存在差异，比如`onChange`事件的实现；
+这样的作用是让react库去抹平事件各个浏览器之间的差异，让开发者用统一的代码，在各个浏览器上实现相同的功能（比如`e.stopPropagation()`，阻止冒泡是由react库内部进行兼容性处理的）
 ### 167. 使用React写一个todo应用，说说你的思路
-### 168. React16的reconciliation和commit分别是什么？
+1. 拆分组件：应用 + 表单部分（input + button）、列表部分（checkbox + ul>li + delete button）
+2. 数据设计：表单的待输入字段 + 列表中的List数据（List item中有content isCompleted）
+3. 数据存放：所有的数据都存放到“应用”组件，事件和子数据都通过props往下传递
+下面是简单的实现
+```jsx
+import React, { useState, useRef } from 'react';
+
+function useTodoList(initialList) {
+  const id = useRef(0);
+  const [list, setList] = useState(initialList);
+  // 增加Todo
+  const add = text => {
+    id.current++;
+    setList(
+      list.concat({
+        id: id.current,
+        text,
+        isCompleted: false
+      })
+    );
+  };
+  // 删除Todo
+  const del = id => {
+    setList(
+      list.filter(e => {
+        return e.id !== id;
+      })
+    );
+  };
+
+  // 设置已完成
+  const toggleStatus = id => {
+    setList(
+      list.map(e => {
+        if (e.id === id) {
+          return {
+            ...e,
+            isCompleted: !e.isCompleted
+          };
+        } else {
+          return { ...e };
+        }
+      })
+    );
+  };
+
+  return [
+    list,
+    {
+      add,
+      del,
+      toggleStatus
+    }
+  ];
+}
+
+const Form = ({ onAdd }) => {
+  const [value, setValue] = useState('');
+  const onChange = event => {
+    const value = event.target.value;
+    setValue(value);
+  };
+  const onSubmit = () => {
+    onAdd(value);
+    setValue('');
+  };
+  return (
+    <React.Fragment>
+      <input value={value} onChange={onChange} />
+      <button onClick={onSubmit}>提交</button>
+    </React.Fragment>
+  );
+};
+
+const TodoList = ({ list, onChange, onDel }) => {
+  const setItemStyle = isCompleted => {
+    return isCompleted ? { 'text-decoration': 'line-through' } : {};
+  };
+  return (
+    <ul>
+      {list.map(e => {
+        return (
+          <li key={e.id} style={setItemStyle(e.isCompleted)}>
+            <input
+              type="checkbox"
+              checked={e.isCompleted}
+              onChange={() => onChange(e.id)}
+            />
+            <span>{e.text}</span>
+            <button onClick={() => onDel(e.id)}>删除</button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
+export default function App() {
+  const [todoList, { add, del, toggleStatus }] = useTodoList([
+    { text: 'text', id: 123, isCompleted: false }
+  ]);
+  return (
+    <div>
+      <Form onAdd={add} />
+      <TodoList list={todoList} onChange={toggleStatus} onDel={del} />
+    </div>
+  );
+}
+
+```
+### **168. React16的reconciliation和commit分别是什么？
 ### 169. React的函数式组件有没有生命周期？
+同[第97题](97-函数式组件有没有生命周期？为什么？)
 ### 170. useState和this.state的区别是什么？
+* useState用在函数市场组件中，是React提供的一个Hook，用于管理函数式组件的状态；this.state是class组件中的状态管理
+* this.state的更新使用`this.setState`的方式；useState中状态的更新是useState返回的数组的第二个元素的函数进行更新
+* 获取修改后的值：this.setState可以用第二个参数函数获取，useState可以通过useEffect副作用执行函数获取
 ### 171. 请说说什么是useImperativeHandle？
+在函数式组件中使用，用于自定义ref的返回值，返回值是一个对象，可以自定义对象的值是函数的内部变量、方法、Node节点等。
+```jsx
+/**
+ * useImperativeHandle Demo
+ */
+import React, { useImperativeHandle, useRef } from 'react';
+
+const FComponent = React.forwardRef((props, ref) => {
+  const inputRef = useRef(null);
+  const divRef = useRef(null);
+  useImperativeHandle(ref, () => {
+    return {
+      focus,
+      div: divRef.current
+    };
+  });
+  const focus = () => {
+    inputRef.current.focus();
+  };
+  return (
+    <>
+      <input ref={inputRef} />
+      <div ref={divRef}>some text</div>
+    </>
+  );
+});
+
+export default function App() {
+  const fcRef = useRef(null);
+  const handleFocus = () => {
+    fcRef.current.focus();
+  };
+  const handleGetDiv = () => {
+    console.log(fcRef.current.div);
+  };
+  return (
+    <div>
+      <FComponent ref={fcRef} />
+      <button onClick={handleFocus}>FOCUS</button>
+      <button onClick={handleGetDiv}>GET DIV</button>
+    </div>
+  );
+}
+
+```
 ### 172. 请说说什么是useReducer？
+useReducer是react内部的hook，用于复杂的数据状态管理，它的参数是一个reducer函数，返回值数组的第一个元素是state，第二个元素是dispatch函数。
+上面[第167题](167-使用React写一个todo应用，说说你的思路)用useReducer的实现如下：
+```jsx
+import React, { useReducer, useState } from 'react';
+let _id = 0;
+const ACTION_TYPES = {
+  ADD: 'ACTION_ADD',
+  DEL: 'ACTION_DEL',
+  TOGGLE_STATUS: 'ACTION_TOGGLE_STATUS'
+};
+
+const reducer = (state, action) => {
+  switch (action.type) {
+    case ACTION_TYPES.ADD:
+      const { text } = action;
+      _id = _id + 1;
+      return state.concat({
+        id: _id,
+        text,
+        isCompleted: false
+      });
+    case ACTION_TYPES.DEL:
+      return state.filter(e => {
+        return e.id !== action.id;
+      });
+    case ACTION_TYPES.TOGGLE_STATUS:
+      return state.map(e => {
+        if (e.id === action.id) {
+          return {
+            ...e,
+            isCompleted: !e.isCompleted
+          };
+        } else {
+          return { ...e };
+        }
+      });
+    default:
+      return state;
+  }
+};
+
+const Form = ({ dispatch }) => {
+  const [value, setValue] = useState('');
+  const onChange = event => {
+    const value = event.target.value;
+    setValue(value);
+  };
+  const onSubmit = () => {
+    dispatch({
+      type: ACTION_TYPES.ADD,
+      text: value
+    });
+    setValue('');
+  };
+  return (
+    <React.Fragment>
+      <input value={value} onChange={onChange} />
+      <button onClick={onSubmit}>提交</button>
+    </React.Fragment>
+  );
+};
+
+const TodoList = ({ list, dispatch }) => {
+  const setItemStyle = isCompleted => {
+    return isCompleted ? { textDecoration: 'line-through' } : {};
+  };
+  return (
+    <ul>
+      {list.map(e => {
+        return (
+          <li key={e.id} style={setItemStyle(e.isCompleted)}>
+            <input
+              type="checkbox"
+              checked={e.isCompleted}
+              onChange={() =>
+                dispatch({
+                  type: ACTION_TYPES.TOGGLE_STATUS,
+                  id: e.id
+                })
+              }
+            />
+            <span>{e.text}</span>
+            <button
+              onClick={() =>
+                dispatch({
+                  type: ACTION_TYPES.DEL,
+                  id: e.id
+                })
+              }
+            >
+              删除
+            </button>
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
+export default function App() {
+  const [todoList, dispatch] = useReducer(reducer, []);
+  return (
+    <div>
+      <Form dispatch={dispatch} />
+      <TodoList list={todoList} dispatch={dispatch} />
+    </div>
+  );
+}
+```
 ### 173. 请说说什么是useRef？
+useRef 接受一个参数，为 ref 的初始值。useRef 保存的变量不会随着每次数据的变化重新生成，而是保持在我们最后一次赋值时的状态.
 ### 174. 请说说什么是useEffect？
+useEffect是副作用函数，第一个参数是函数，第二个参数是依赖的数据数组，当依赖数组中的数据变化时，触发第一个参数函数的执行。有以下的几种使用方式
+1. 
 ### 175. 举例说明useState
 ### 176. 请说说什么是useState？为什么要使用useState？
 ### 177. 请描述下你对React的新特性Hooks的理解？它有哪些应用场景？
