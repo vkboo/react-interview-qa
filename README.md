@@ -1903,12 +1903,76 @@ export default function App() {
 useRef 接受一个参数，为 ref 的初始值。useRef 保存的变量不会随着每次数据的变化重新生成，而是保持在我们最后一次赋值时的状态.
 ### 174. 请说说什么是useEffect？
 useEffect是副作用函数，第一个参数是函数，第二个参数是依赖的数据数组，当依赖数组中的数据变化时，触发第一个参数函数的执行。有以下的几种使用方式
-1. 
+1. 模拟`componentDidMount`：常用作初始ajax请求，获取ref节点等操作
+```jsx
+import { useEffect } from 'react';
+function Demo() {
+  useEffect(() => {
+    // ...
+  }, []);
+  return <h1>Demo</h1>;
+}
+```
+2. 模拟`componentWillUnMount`: 用作取消订阅、清除定时器，需要随着组件的卸载而从内存中移除的操作放在这里
+```jsx
+import { useEffect } from 'react';
+function Demo() {
+  useEffect(() => {
+    return () => {
+      // ...
+    }
+  }, []);
+  return <h1>Demo</h1>;
+}
+```
+3. 监听state值的变化，用最新的值进行副作用的操作
+```jsx
+import { useState, useEffect } from 'react';
+const [userId, setUserId] = useState(null);
+function Demo() {
+  useEffect(() => {
+    if (userId) {
+      // ...
+    }
+  }, [userId]);
+  return <h1>Demo</h1>;
+}
+```
 ### 175. 举例说明useState
+```jsx
+import { useState } from 'react';
+const [count, setCount] = useState(0);
+function Demo() {
+  const doAdd1 = () => {
+    setCount(prevCount + 1);
+  };
+  const doAdd2 = () => {
+    setCount(prevCount => prevCount + 1);
+  };
+  return <>
+    <h1>{count}</h1>
+    <button onClick={doAdd1}>Add-方式1</button>
+    <button onClick={doAdd2}>Add-方式2</button>
+  </>;
+}
+```
 ### 176. 请说说什么是useState？为什么要使用useState？
+`useState`是React原生的Hook，它接受一个参数，这个参数可以是对象或者普通的基本数据类型的值，也可以是一个有返回值的函数，`useState`函数返回一个数组，数组的第一个元素是`useState`接受的值或函数的返回值，第二个元素是设置这个值的方法；
+在Hooks之前，函数式组件都是无状态的组件，引入了useState这个hook之后，让函数式组件也能够管理自己的状态
 ### 177. 请描述下你对React的新特性Hooks的理解？它有哪些应用场景？
+理解：
+1. Hooks赋予了函数式组件更强大的能力，能让让函数式组件有状态，可以做以前class组件才能做到的更有逻辑的业务
+2. Hooks方便了业务的抽离，相比与以前HOC的代码不容易理解，组件容易形成嵌套地狱等问题，Hooks不仅能够针对单一的逻辑进行抽离，同时也解决了HOC的种种问题
+3. Hooks就是对数据管理的抽离，以前通过`utils`的纯JS代码，现在也能够通过hooks后的封装，实现“响应式”
+应用：
+1. 对副作用的处理,用于模拟生命周期，对数据状态的监听，这个主要用到了`useEffect`hook，详情可以看[第174题](请说说什么是useEffect)
+2. `useMemo``useCallback`对变量、函数的缓存，结合`React.PureComponent``React.memo`可以避免不需要的render
+3. `useRef`声明一个状态值，不随着组件函数的执行而重新赋值，只以最后一次赋值为准
+4. useContext是Context API的hooks版本，用于在组件中的context进行取值
+4. 常用的第三方库的hooks: 比如`react-router`的`useLocation` `useParams` `useRouteMatch` `useHistory`，`react-redux`的`useDispatch` `useSelector`等
+5. 单一业务逻辑抽离成自定义hooks
 ### 178. 说说你对Error Boundaries的理解
-### 179. 说说你对Fiber架构的理解
+### **179. 说说你对Fiber架构的理解
 ### 180. 说说你是怎么理解React的业务组件和技术组件的？
 ### 181. 为什么建议setState的第一个参数是callback而不是一个对象呢?
 ### 182. 展示组件和容器组件有什么区别？
