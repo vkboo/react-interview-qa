@@ -2067,27 +2067,112 @@ setState是异步的，setState之后，取state中的值并不一定是最新�
 ### 200. 在React中遍历的方法有哪些？它们有什么区别呢？
 有`React.Children.map`和 `React.Children.forEach`这两个方法，他们的参数都是在组件中接受`props.children`这个ReactNode作为参数，然后进行遍历。专门提供这两个遍历方法的目的是`props.children`可能是字符串、null、数组，用`React.Children.map`可以抹平这些数据类型的差异，使之都能进行循环，并返回合理的值
 ### 201. 请说说你对React的render方法的理解
+render是class组件中必须被重载的方法，组件执行render方法的条件可以看[第6题](4-说说你对React的渲染原理的理解)。
+render方法的执行不一定会导致DOM的重新渲染，DOM的重新渲染的条件是render前后的DOM diff比较的结构不一致。
 ### 202. props.children.map和js的map有什么区别？为什么优先选择React的？
+专门提供`props.children.map`这个遍历方法的目的是`props.children`可能是字符串、null、数组，用`React.Children.map`可以抹平这些数据类型的差异，使之都能进行循环，并返回合理的值.
 ### 203. 有用过React的严格模式吗？
-### 204. React中的setState和replaceState的区别是什么？
-### 205. React中的setState缺点是什么呢？
+重复问题可以看[第22题](22-React的严格模式有什么好处？)
+### **204. React中的setState和replaceState的区别是什么？
+(没听过replaceState)
+### **205. React中的setState缺点是什么呢？
+* 如果需要属性值是引用数据类型，则需要保持数据的不可变形，即需要将整个对象(数组)复制一份
 ### 206. 有用过React的Fragment吗？它的运用场景是什么？
+参考[第70题](你有用过React.Fragment吗？说说它有什么用途？)
 ### 207. React组件间共享数据方法有哪些？
-### 208. React的状态提升是什么？使用场景有哪些？
+* props:只能通过父组件传到子组件，可以通过穿函数的props把子组件的数据通过回调函数传回来
+* Context：Context.Provider下的组件可以共享Provider提供的数据，可以通过在Provider中提供操作Provider value的方法，实现在子组件中修改Provider的数据
+### **208. React的状态提升是什么？使用场景有哪些？
 ### 209. 简单描述下你有做过哪些React项目？
+XX管理系统：脚手架使用craco，可以避免`create-react-app`需要eject才能自定义webpack配置的问题；数据管理使用了dvajs，它是对Redux-Saga的封装，可以对异步的数据管理进行处理；路由上使用了react-router-dom
 ### 210. 在构造函数中调用super(props)的目的是什么？
+这是ES6的语法。class组件继承自React.Component，super(props)之后，作为子类的组件可以拿到父类的this，使之可以调用父类的属性和方法，如`this.setState``this.props`等等
 ### 211. 你是如何学习React的？
-### 212. 从旧版本的React升级到新版本的React有做过吗？有遇到过什么坑？
+看文档，看相关生态文档、看Github项目上相关项目的代码实现、看面试题、实践
+### **212. 从旧版本的React升级到新版本的React有做过吗？有遇到过什么坑？
+(没做过)
 ### 213. 你用过React版本有哪些？
+只用过React16.8+
 ### 214. 有用过React的服务端渲染吗？怎么做的？
+(没做过)
 ### 215. React的mixins有什么作用？适用于什么场景？
+(老旧API，不需关心，现在已经被HOC和hooks代替了)
 ### 216. React怎么拿到组件对应的DOM元素？
+通过ref，ref在class组件和函数式组件中有各自的使用方式。
+* 在Class组件中
+```jsx
+import React from 'react';
+class CComponent extends React.Component {
+  refDiv = React.createRef();
+  componentDidMount () {
+    console.log(this.refDiv.current)
+  }
+  render () {
+    return <div>
+      <div className="test" ref={this.refDiv}>demo</div>
+    </div>
+  }
+}
+
+export default CComponent;
+
+// 老旧语法
+import React from 'react';
+class CComponent extends React.Component {
+  // refDiv = React.createRef();
+  componentDidMount () {
+    console.log(this.refDiv)
+  }
+  render () {
+    return <div>
+      <div className="test" ref={ref => this.refDiv}>demo</div>
+    </div>
+  }
+}
+
+export default CComponent;
+```
+* 在函数式组件中
+```jsx
+import React, { useRef, useEffect } from 'react';
+
+const FComponent = () => {
+  const refDiv = useRef();
+  useEffect(() => {
+    console.log(refDiv.current);
+  }, []);
+  return <div>
+    <div className="demo" ref={refDiv}>test</div>
+  </div>
+}
+export default FComponent;
+```
 ### 217. 请描述下事件在React中的处理方式是什么？
+* 合成事件
+* 事件委托
+* React17中事件的变化
 ### 218. JSX和HTML有什么区别？
+* JSX是类HTML的语法，它是嵌在javascript，JSX标签返回的是一个JSX对象
+* HTML当时是无法写在JS中的，所以才有了JSX，因为JSX是嵌入到JavaScript当中的，所以要避免JS保留字的使用，如for要写成forHTML，class需要写成className
+* JSX没有自己的模版语法糖，因为可以用过原生的js表达式操作它，如只需要把表达式写在`{}`中即可，其中也可以写注释
 ### 219. React的书写规范有哪些？
+* React元素必须使用大驼峰命名的方式
+* 组件尽量命名，方便进行调试
+* JSX尽量用小括号包起来，方便调试
 ### 220. create-react-app创建新运用怎么解决卡的问题？
+(没听cra会导致有这个问题)
 ### 221. 使用React的方式有哪几种？
+没看懂是什么意思。
+如果是脚手架的选择，目前有CRA、Craco、umijs；
+如果是打包工具：有最主流的webpack、Rullup、vitejs可供选择
 ### 222. 说说你对reader的context的理解
+这个题想问的应用是render函数的上下文，而非`React.createContext`的那个Context。
+不管是class组件还是函数式组件，React的组件本质上都是函数，从根组件到下面大大小小的子组件，React组件树即构成了函数的嵌套，React的渲染/更新即时从顶层函数执行，一步一步的递归执行内部嵌套函数的过程，这是一个原生的JS执行栈执行的过程。
 ### 223. 同时引用这三个库React.js、React-dom.js和babel.js它们都有什么作用？
+* React.js: React中的组件(`Component`)、Context、hooks等核心Api，还有虚拟DOM的比较、Fiber的算法实现等
+* React-dom.js 与web浏览器DOM相关的API，比如虚拟DOM的挂载，DOM的更新，Portal等
+* babel.js ES6+代码的转义
 ### 224. 你知道Virtual DOM的工作原理吗？
+(Fiber相关)
 ### 225. 你阅读过React的源码吗？简要说下它的执行流程
+(没读过)
