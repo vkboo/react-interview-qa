@@ -2057,10 +2057,15 @@ export default logger;
 ### 196. React中setState的第二个参数作用是什么呢？
 第二个参数是一个callback函数，用于setState设置state的属性值成功之后的回调，此时调用`this.state.property`可以取到刚刚设置的最新的值
 ### 197. React中的setState是同步还是异步的呢？为什么state并不一定会同步更新？
-异步的
+setState是异步的，setState之后，取state中的值并不一定是最新更新的值。
+这样设计的原因是可能在同步的代码中可能存在连续的多个setSate操作，react会对他们进行智能的合并，直到执行到了最后一个setState，React才回智能的合并state的，并异步的设置state的值，后续判断是否进行render操作.
 ### 198. React中的setState批量更新的过程是什么？
-### 199. React中的setState执行机制是什么呢？
+同步代码中的多个setState执行完成了，react对涉及到的state进行批量的合并，再异步的对state中的属性进行赋值，后续根据shouldComponent的返回值情况决定是否re-render.
+### **199. React中的setState执行机制是什么呢？
+只要执行了setState方法，必然会引起组件的更新流程。
+[参考文章](https://juejin.cn/post/6844903781813993486)
 ### 200. 在React中遍历的方法有哪些？它们有什么区别呢？
+有`React.Children.map`和 `React.Children.forEach`这两个方法，他们的参数都是在组件中接受`props.children`这个ReactNode作为参数，然后进行遍历。专门提供这两个遍历方法的目的是`props.children`可能是字符串、null、数组，用`React.Children.map`可以抹平这些数据类型的差异，使之都能进行循环，并返回合理的值
 ### 201. 请说说你对React的render方法的理解
 ### 202. props.children.map和js的map有什么区别？为什么优先选择React的？
 ### 203. 有用过React的严格模式吗？
