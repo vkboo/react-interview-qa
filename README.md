@@ -2016,7 +2016,7 @@ export default Demo;
 ### 186. shouldComponentUpdate方法是做什么的？
 shouldComponentUpdate是React组件的生命周期，在组件更新后触发，该方法继承子React.Component.方法的作用是可以在内部比较更新前后的state和props的值，手动控制当前组件是否需要执行render函数，函数签命是`shouldComponentUpdate(nextProps, nextState)`
 ### 187. 怎样在React中使用innerHTML？
-使用`dangerouslySetInnerHTML`属性,该属性传入一个对象，对象中`__html`属性的值及时innerHTML的富文本代码
+使用`dangerouslySetInnerHTML`属性,该属性传入一个对象，对象中`__html`属性的值即时innerHTML的富文本代码
 ### **188. 你有写过React的中间件插件吗？
 (React中Redux有中间件的概念，没有听过React的中间件，这道题没有理解，这道题和以下的两道题都按照Redux中间件进行回答)
 简单的实现Redux的logger中间件，代码如下:
@@ -2035,13 +2035,29 @@ export default logger;
 ### **190. React中你用过哪些第三方的中间件？
 * redux-thunk: Redux的异步处理方案,actionCreator中可以返回一个函数（即可以dispatch一个function），函数内在写异步的代码
 * redux-saga: Redux的异步处理方案，没有破坏redux中dispatch一个plain object的原则，内部利用generator的方式实现异步的方式, 同时还提供了watch、put、call等工具方法更好的实现异步的调用
-### 191. 不用脚手架，你会手动搭建React项目吗？
+### **191. 不用脚手架，你会手动搭建React项目吗？
+(需要实践，实践后把过程贴出来)
 ### 192. 请说说React中Portal是什么？
+核心API是`ReactDOM.createPortal(ReactNode, DOMContainer)`，返回值是一个`ReactNode`。返回的ReactNode需要在组件的render函数(函数式组件的返回值)中进行渲染，createPortal接受的ReactNode将会挂载到DOMContainer这个元素上，和render函数中的树结构不一致；但是，从React的角度看，createPortal的节点依然保持render函数的树形结构，Props、Context等特性可以正常的通过负责组件传递到portal组件中。
 ### 193. React中修改prop引发的生命周期有哪几个？
+1. `static getDerivedStateFromProps`
+2. `shouldComponentUpdate`
+3. `render`
+4. `getSnapshotBeforeUpdate`
+5. `componentDidUpdate`
 ### 194. React多个setState调用的原理是什么？
+同步调用多个setState，React并不会连续多次的进行更新操作，而是会将同步中的多个setState操作合成一个，只执行一次render操作
 ### 195. React中调用setState会更新的生命周期有哪几个？
+(>=16.4之后，于props的更新一致， <16.4的版本没有`static getDerivedStateFromProps`)
+1. `static getDerivedStateFromProps`
+2. `shouldComponentUpdate`
+3. `render`
+4. `getSnapshotBeforeUpdate`
+5. `componentDidUpdate`
 ### 196. React中setState的第二个参数作用是什么呢？
+第二个参数是一个callback函数，用于setState设置state的属性值成功之后的回调，此时调用`this.state.property`可以取到刚刚设置的最新的值
 ### 197. React中的setState是同步还是异步的呢？为什么state并不一定会同步更新？
+异步的
 ### 198. React中的setState批量更新的过程是什么？
 ### 199. React中的setState执行机制是什么呢？
 ### 200. 在React中遍历的方法有哪些？它们有什么区别呢？
@@ -2055,3 +2071,18 @@ export default logger;
 ### 208. React的状态提升是什么？使用场景有哪些？
 ### 209. 简单描述下你有做过哪些React项目？
 ### 210. 在构造函数中调用super(props)的目的是什么？
+### 211. 你是如何学习React的？
+### 212. 从旧版本的React升级到新版本的React有做过吗？有遇到过什么坑？
+### 213. 你用过React版本有哪些？
+### 214. 有用过React的服务端渲染吗？怎么做的？
+### 215. React的mixins有什么作用？适用于什么场景？
+### 216. React怎么拿到组件对应的DOM元素？
+### 217. 请描述下事件在React中的处理方式是什么？
+### 218. JSX和HTML有什么区别？
+### 219. React的书写规范有哪些？
+### 220. create-react-app创建新运用怎么解决卡的问题？
+### 221. 使用React的方式有哪几种？
+### 222. 说说你对reader的context的理解
+### 223. 同时引用这三个库React.js、React-dom.js和babel.js它们都有什么作用？
+### 224. 你知道Virtual DOM的工作原理吗？
+### 225. 你阅读过React的源码吗？简要说下它的执行流程
