@@ -1972,18 +1972,69 @@ function Demo() {
 4. 常用的第三方库的hooks: 比如`react-router`的`useLocation` `useParams` `useRouteMatch` `useHistory`，`react-redux`的`useDispatch` `useSelector`等
 5. 单一业务逻辑抽离成自定义hooks
 ### 178. 说说你对Error Boundaries的理解
+错误边界是React16新推出的一种错误处理的方式，在v16之前，React的抛错会导致页面显示的错误，v16修改这种方式成了组件如果产生了错误，那么从这个组件到根组件都会因为错误而崩溃掉，不让用户看到错误组件的信息，如果将产生错误的组件用错误边界组件包裹起来，那么错误的“冒泡”就会在错误边界这里被阻止，依据自定义的错误边界组件可以给用户抛出自定义的错误信息。
+React的设计者认为不给用户显示信息，比给用户显示错误的信息要更加的合理，所以采用了这样的一种方案。
+错误边界的使用示例可以查看[第26题](26-React中在哪捕获错误？)
 ### **179. 说说你对Fiber架构的理解
 ### 180. 说说你是怎么理解React的业务组件和技术组件的？
+业务组件即代码逻辑紧贴业务，如ajax请求，一些特定的需求特性等；
+技术组件即使比较通用性的组件，如对loading的处理、ajax的hoc等
 ### 181. 为什么建议setState的第一个参数是callback而不是一个对象呢?
+因为setState是一个异步的过程，使用setState设置了state中的某一个属性property的值之后，马上取this.state.property并不会得到刚刚设置的值。如果setState第一个参数是callback的话，callback的第一个参数是上一次setState的值，这样每次setState内部的赋值关系都是异步的，都会依赖上一次的求值，使赋值更加可靠、稳定.通过下面的Demo代码可以看出两者的差异
+```jsx
+import React from 'react';
+class Demo extends React.Component {
+    state = {
+        count: 0,
+    }
+    componentDidMount () {
+        for (var i = 0; i < 10; i++) {
+            // render内展示： DEMO: 1
+            // this.setState({
+            //     count: this.state.count + 1,
+            // })
+            // render内展示： DEMO: 10
+            this.setState(prevState => ({
+                count: prevState.count + 1
+            }))
+        }
+    }
+    render() {
+        return <>
+            <h1>DEMO: { this.state.count }</h1>
+        </>
+    }
+}
+export default Demo;
+```
 ### 182. 展示组件和容器组件有什么区别？
-### 183. Mern和Yeoman脚手架有什么区别？
-### 184. 你有在项目中使用过Yeoman脚手架吗？
-### 185. 你有在项目中使用过Mern脚手架吗？
+展示组件也叫无状态组件，组件组件本身不维护自己的state，接受props进行展示与简单的事件处理;
+容器组件一般是有状态的，也可以接受props，内部包含了各种组件与相关的逻辑;
+### **183. Mern和Yeoman脚手架有什么区别？
+### **184. 你有在项目中使用过Yeoman脚手架吗？
+### **185. 你有在项目中使用过Mern脚手架吗？
 ### 186. shouldComponentUpdate方法是做什么的？
+shouldComponentUpdate是React组件的生命周期，在组件更新后触发，该方法继承子React.Component.方法的作用是可以在内部比较更新前后的state和props的值，手动控制当前组件是否需要执行render函数，函数签命是`shouldComponentUpdate(nextProps, nextState)`
 ### 187. 怎样在React中使用innerHTML？
-### 188. 你有写过React的中间件插件吗？
-### 189. React的中间件机制是怎么样的？这种机制有什么作用？
-### 190. React中你用过哪些第三方的中间件？
+使用`dangerouslySetInnerHTML`属性,该属性传入一个对象，对象中`__html`属性的值及时innerHTML的富文本代码
+### **188. 你有写过React的中间件插件吗？
+(React中Redux有中间件的概念，没有听过React的中间件，这道题没有理解，这道题和以下的两道题都按照Redux中间件进行回答)
+简单的实现Redux的logger中间件，代码如下:
+```JavaScript
+const logger = store => next => action => {
+    console.group(action.type)
+    console.info('dispatching', action)
+    let result = next(action);
+    console.log('next state', store.getState())
+    console.groupEnd()
+    return result;
+};
+export default logger;
+```
+### **189. React的中间件机制是怎么样的？这种机制有什么作用？
+### **190. React中你用过哪些第三方的中间件？
+* redux-thunk: Redux的异步处理方案,actionCreator中可以返回一个函数（即可以dispatch一个function），函数内在写异步的代码
+* redux-saga: Redux的异步处理方案，没有破坏redux中dispatch一个plain object的原则，内部利用generator的方式实现异步的方式, 同时还提供了watch、put、call等工具方法更好的实现异步的调用
 ### 191. 不用脚手架，你会手动搭建React项目吗？
 ### 192. 请说说React中Portal是什么？
 ### 193. React中修改prop引发的生命周期有哪几个？
