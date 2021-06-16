@@ -2176,19 +2176,67 @@ export default FComponent;
 (Fiber相关)
 ### 225. 你阅读过React的源码吗？简要说下它的执行流程
 (没读过)
-
 ### 226. React中怎样阻止组件渲染？
+* class组件
+- 使用shouldComponentUpdate生命周期，`return false`
+- 继承`React.PureComponent`只要prop没有改变(浅比较)，就不会执行render函数
+* 函数式组件
+- 使用React.memo包裹组件函数，props没有改变就不会执行函数
+- 使用React.memo包裹函数的同时传入比较函数作为第二个参数，`return true`，组件函数就不会执行
 ### 227. React非兄弟组件如何通信？
+* props可以从父组件传入到子组件进行通信
+* props可以从父组件传入一个callback function到子组件，通过参数回调的形式实现子组件传参到父组件（如子组件是受控组件的实现）
+* 利益Context API，可以实现Provider下任意组件之间的通信
 ### 228. React兄弟组件如何通信？
+* 把兄弟组件的数据都放在共有的父组件中，数据通过父组件往下传递，改变数据的方法也作为props通过父组件往下传递
+* 利益Context API，可以实现Provider下任意组件之间的通信
 ### 229. React非父子组件如何通信？
+* 把所有组件的数据都放在共有的顶层组件中，数据通过顶层组件往下传递，改变数据的方法也作为props通过顶层组件往下传递
+* 利益Context API，可以实现Provider下任意组件之间的通信
 ### 230. React父子组件如何通信？
+* props可以从父组件传入到子组件进行通信
+* props可以从父组件传入一个callback function到子组件，通过参数回调的形式实现子组件传参到父组件（如子组件是受控组件的实现）
+* 利益Context API，可以实现Provider下任意组件之间的通信
 ### 231. React组件间的通信有哪些？
+* Props
+* Context
 ### 232. 类组件和函数式组件有什么区别？
+* 写法不同，类组件是类是一个构造函数，在react内部需要被实例化；函数式组件是一个普通的函数，不需要被实例化，没有实例
+* 类组件有自己的生命周期，函数式组件只能通过`useEffect`hook实现类生命周期的概念
+* ref可以直接引用类组件，并调用到类组件的实例；ref不能直接引用函数式组件，需要通过`React.forwardRef`进行转发
+* 函数式组件可以使用Hooks，类组件不能
+* 错误边界只能通过类组件才能实现
 ### 233. React自定义组件你写过吗？说说看都写过哪些？
+* 利用svg技术实现的手写画板
+* 结合公司业务实现的自定义学段学科年级选择器
+* 数据统计的统一封装(echarts等)
 ### 234. React组件的state和props两者有什么区别？
+* state是本组件维护的状态，props是从父组件接受而来的数据，他们都是可响应的，即数据的变化(引用类型通过浅比较)可以引用render函数或者函数式组件的重新执行
+* 两种数据都是immutable的，state可以通过setState进行异步的改变，props不可更改
 ### 235. React有几种构建组件的方式？可以写出来吗？
+（没明白这道题的意思）
 ### 236. React中遍历时为什么不用索引作为唯一的key值？
+key值的目的在Diff DOM的时候根据render前后的唯一key值快速的对树进行比较，保证key值得唯一性，如在进行中间插入或者最顶上插入时，算法会很明显得知道这是一个插入动作，然后让后续得node往后移位，如果是以索引index作为key值，那么在进入上述的操作后，插入后面的元素key值完全变了，算法不能准确的定位到树中node的位置，只能从插入起，后续的全部重新生成，影响性能
 ### 237. React中的key有什么作用？
+通过开发者给组件制定`key`属性，来告知渲染哪些子元素在不同的渲染下可以保持不变
+`key`属性解决的就是列表在进行一对一比较的过程中，新元素树，从中间或者顶部插入的问题；例如，从顶部插入，那么react一对一的往下比较，那么每次比较都是不相同的，react会重建每一个元素；指定了key值之后，react会按照key值进行比较，react就会知道原有的列表只是往下移动了而已，创建的元素只有顶部的一个
 ### 238. React中除了在构造函数中绑定this,还有别的方式吗？
+* 可以使用public class field 语法，demo如下:
+```jsx
+import React from 'react';
+export class CComponent extends React.Component {
+    onSubmit = () => {
+        // code 
+    }
+    render () {
+        <button onClick={this.onSubmit}>submit</button>        
+    }
+}
+```
+* 在使用的时候进行`bind`绑定
 ### 239. 在React中页面重新加载时怎样保留数据？
-### 240. 请描述下React的事件机制
+每次页面加载完成后讲需要保留的数据保存到sessionStorage中，页面重新加载时再从sessionStorage中获取，如果取不到，再用默认值
+### **240. 请描述下React的事件机制
+* 事件合成
+* 事件委托
+* React17事件的变化
