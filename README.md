@@ -893,7 +893,7 @@ const Demo = () => {
 export default Demo;
 ```
 ### 73. React什么是有状态组件？
-状态即是React中的state，有状态组件就是React组件中有state在维护的组件，在Hooks之前，一般class组件都是有状态组件(如果只用props，也是无状态组件)，Functional组件都是无状态组件，
+状态即是React中的state，有状态组件就是React组件中有state在维护的组件，在Hooks之前，一般class组件都是有状态组件(如果只用props，也是无状态组件)，Functional组件都是无状态组件
 ### 74. React v15中怎么处理错误边界？
 (过时的API，无需关注，最新的错误边界处理可以参考[第26题](#26-React中在哪捕获错误？)
 ### 75. *React Fiber它的目的是解决什么问题？
@@ -2241,14 +2241,96 @@ export class CComponent extends React.Component {
 * 事件委托
 * React17事件的变化
 ### 241. 怎样在React中创建一个事件？
-### 241. 在React中无状态组件有什么运用场景？
-### 241. 描述下在React中无状态组件和有状态组件的区别是什么？
-### 241. 写一个React的高阶组件(HOC)并说明你对它的理解
-### 241. React中可以在render访问refs吗？为什么？
-### 241. React中refs的作用是什么？有哪些应用场景？
-### 241. 请描述你对纯函数的理解？
-### 241. 受控组件和非受控组件有什么区别？
-### 241. React中什么是非控组件？
+这道题中的“创建”我理解的是，如果在React中声明一个事件，而非原生的`CustomEvent`自定义事件的创建与触发，因为这在React中存在的意义不大。
+React中事件是直接绑定在标签上的，如果是HTML原生标签，则可以用`on`前缀，后加事件类型的形式进行声明，用的是小驼峰的命名，如`<div onClick={this.handleClick}></div>`;
+需要注意的是，在类组件中的事件函数要注意`this`的绑定，可以在`JSX`中绑定，可以在`constructor`中绑定，可以用`public class field`的语法让事件中的`this`指向组件实例，推荐后两种方式.
+### 242. 在React中无状态组件有什么运用场景？
+适用于逻辑简单的纯展示的场景，如资料卡片等
+### 243. 描述下在React中无状态组件和有状态组件的区别是什么？
+状态即是React中的state，有状态组件就是React组件中有state在维护的组件，在Hooks之前，一般class组件都是有状态组件(如果只用props，也是无状态组件)，Functional组件都是无状态组件（hooks之前）；无状态组件适用于简单的纯展示，它们需要被有状态组件引用，有状态组件逻辑相对复杂，有自己的state，需要处理副作用等反馈到state状态上.
+### 244. 写一个React的高阶组件(HOC)并说明你对它的理解
+HOC是指接受一个组件作为参数且返回另一个组件的函数，高阶组件内部本身有一个组件的逻辑，所以它维护了自身的一套数据状态，在hoc内部的组件中，可以在render函数中控制组件的props，控制什么组件进行return，这就是渲染劫持。利用这个能力，可以通过HOC封装出一些使用于组件的通过化逻辑，比如下面的loading，还有ajax请求，像react-router的widthRouter，react-redux的connect，这些高阶组件的实现本质上都是上述说的这个逻辑.
+但是高阶函数也有自身的缺点：
+1. ref无法直接传递：可以在hoc中处理，通过`React.forwardRef`进行转发
+2. 容易形成嵌套地狱，调试不直观
+3. 组件层层嵌套的逻辑不易于理解
+4. 不同的高阶组件可能会有嵌套顺序的要求，比较容易出错：如withRouter和connect一起用一定把withRouter写外面
+```JSX
+// app.jsx
+import React from 'react';
+import Child from './Child.jsx';
+import HocLoading from './hocLoading';
+
+const LoadingChild = HocLoading(Child);
+
+class Demo extends React.Component {
+
+    state = {
+        loading: true,
+    }
+
+    componentDidMount() {
+        setTimeout(() => {
+            this.setState({
+                loading: false,
+            })
+        }, 2000)
+    }
+
+    render() {
+        return <LoadingChild loading={this.state.loading}>parent content</LoadingChild>
+    }
+}
+
+export default Demo;
+
+// hocLoading.js
+import React from 'react';
+export default function HocLoading (WrappedComponent) {
+    class ComponentLoading extends React.Component {
+        render () {
+            const { loading } = this.props;
+            return (
+                loading
+                ? <h4>loading...</h4>
+                : <WrappedComponent {...this.props} />
+            )
+        }
+    }
+    return ComponentLoading;
+}
+
+// Child.jsx
+import React from 'react';
+
+class Child extends React.Component {
+    render() {
+        return <>
+            <h1>This is Content!</h1>
+            <div>{this.props.children}</div>
+        </>
+    }
+}
+
+export default Child;
+```
+### 245. React中可以在render访问refs吗？为什么？
+不能，render阶段，ref还没有真实的挂载到DOM节点上，至少要在`componentDidMount`阶段进行访问
+### 246. React中refs的作用是什么？有哪些应用场景？
+* 作用
+- 对类组件、DOM节点的引用
+- 在函数式组件中声明一个不会随着函数组件的执行而变化的变量，这个变量总是以最后一次赋值为准
+* 应用场景
+- class组件中通过ref拿到子class组件的实例
+- ref绑定到原生节点上拿到原生节点的DOM
+- 通过在函数式子组件中声明`useImperativeHandle`hook，可以拿到从函数式的子组件中拿到子组件像抛出的任意属性和方法
+### 247. 请描述你对纯函数的理解？
+* 给定了输入的参数，则函数抛出的数据就是确定的
+* 函数内没有副作用(定时器，ajax等)
+### 248. 受控组件和非受控组件有什么区别？
+受控组件于非受控组件是针对表单元素来讲的，React是MVVM的库，数据(Model)的更新会通过ViewModel反映到视图(View)上，然而视图的更新并不会自动的映射到数据中，按照库默认的处理方式，则所有的表单就控件都是非受控组件，如果手动指定了表单元素的onChange事件，在事件函数中手动给相应的数据进行赋值，且这个值在绑定在表单的`value`/`checked`属性上，则这个表单元素就是受控组件。
+简单的说受控于非受控的区别就是数据于视图之间是否互相绑定。按照React的思想来说，一般我们在进行表单处理的时候都需要把组件处理成受控的，这样在做复杂的表单校验、提交数据的获取都会方便很多.
+### 249. React中什么是非控组件？
 ### 250. React中什么是受控组件？
 ### 251. React中发起网络请求应该在哪个生命周期中进行？为什么？
 ### 252. 说说React的生命周期有哪些？
