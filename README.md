@@ -2331,9 +2331,108 @@ export default Child;
 受控组件于非受控组件是针对表单元素来讲的，React是MVVM的库，数据(Model)的更新会通过ViewModel反映到视图(View)上，然而视图的更新并不会自动的映射到数据中，按照库默认的处理方式，则所有的表单就控件都是非受控组件，如果手动指定了表单元素的onChange事件，在事件函数中手动给相应的数据进行赋值，且这个值在绑定在表单的`value`/`checked`属性上，则这个表单元素就是受控组件。
 简单的说受控于非受控的区别就是数据于视图之间是否互相绑定。按照React的思想来说，一般我们在进行表单处理的时候都需要把组件处理成受控的，这样在做复杂的表单校验、提交数据的获取都会方便很多.
 ### 249. React中什么是非控组件？
+表单元素的`value`/`checked`值、`onChange`事件没有和组件的state存在绑定关联关系，如果需要获取表单元素的值，需要使用`ref`获取DOM，然后得到元素的值.demo如下：
+```jsx
+import React from 'react';
+class FormDemo extends React.Component {
+    refUsername = React.createRef();
+    refPassword = React.createRef();
+    onSubmit = () => {
+        const [
+            username,
+            password,
+        ] = [
+            this.refUsername.current.value,
+            this.refPassword.current.value,
+        ];
+        console.log({
+            username,
+            password,
+        })
+    }
+    render () {
+        return (
+            <div className="form">
+                <p>
+                    <span>用户名:</span>
+                    <input ref={this.refUsername} name="username" />
+                </p>
+                <p>
+                    <span>密码:</span>
+                    <input ref={this.refPassword} name="password" />
+                </p>
+                <button onClick={this.onSubmit}>登录</button>
+            </div>
+        )
+    }
+}
+export default FormDemo;
+```
 ### 250. React中什么是受控组件？
+表单元素的`value`/`checked`值与state绑定，同时表单元素的onChange可以动态的改变对应的state的值，即数据的变更可以更新视图，用户操作视图的更新也可以触发state数据的更新.
+```jsx
+import React from 'react';
+class FormDemo extends React.Component {
+    state = {
+        username: '',
+        password: ''
+    }
+    handleChange = event => {
+        const { name, value } = event.target;
+        this.setState({
+            [name]: value,
+        });
+    }
+    onSubmit = () => {
+        const { username, password } = this.state;
+        console.log({
+            username,
+            password,
+        })
+    }
+    render () {
+        const { username, password } = this.state;
+        return (
+            <div className="form">
+                <p>
+                    <span>用户名:</span>
+                    <input value={username} name="username" onChange={this.handleChange} />
+                </p>
+                <p>
+                    <span>密码:</span>
+                    <input value={password} name="password" onChange={this.handleChange} />
+                </p>
+                <button onClick={this.onSubmit}>登录</button>
+            </div>
+        )
+    }
+}
+export default FormDemo;
+```
 ### 251. React中发起网络请求应该在哪个生命周期中进行？为什么？
+需要在`componentDidMount`中进行。网络请求应当尽早的进行，`componentDidMount`是在`render`后执行的生命周期方法，这里可以进行安全的`setState`，如果组件的更新需要触发网络请求的话，可以在`componentDidUpdate`中进行.
 ### 252. 说说React的生命周期有哪些？
+这里说的都是React v16.4及之后的声明周期。
+* 挂载
+- constructor
+- static getDerivedStateFromProps
+- render 
+- componentDidMount
+* 更新
+- static getDerivedStateFromProps
+- shouldComponentUpdate
+- render 
+- getSnapshotBeforeUpdate
+- componentDidUpdate
+* 卸载
+- componentWillUnmount
 ### 253. 说说你对“在React中，一切都是组件”的理解
+* React采用组件化的思想，最小的组件单位就是原生HTML元素，采用JSX的语法声明组件的调用
+* React的虚拟DOM，就是一个大的组件树，从父组件层到子组件，在render函数中层层堆叠
+* 从react-router v4开始，路由本身也是组件
+* 各个库提供的hoc返回的也是组件，如withRouter、connect
 ### 254. 写React你是用es6还是es5的语法？有什么区别？
+（老旧问题，没有考察的必要性）
 ### 255. 浏览器为什么无法直接JSX？怎么解决呢？
+因为浏览器只能解决原生的JS代码，jsx不属于原生的js，它是类似于html的语法，然后转化成一个js对象。
+这个转化的过程就是通过Babel的`@babel/plugin-transform-react-jsx`插件实现的。
