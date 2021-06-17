@@ -2436,3 +2436,18 @@ export default FormDemo;
 ### 255. 浏览器为什么无法直接JSX？怎么解决呢？
 因为浏览器只能解决原生的JS代码，jsx不属于原生的js，它是类似于html的语法，然后转化成一个js对象。
 这个转化的过程就是通过Babel的`@babel/plugin-transform-react-jsx`插件实现的。
+### 256. 在使用React过程中你都踩过哪些坑？你是怎么填坑的？
+### 257. 说说你喜欢React的原因是什么？它有什么优缺点？
+### 258. 如何解决引用类型在pureComponent下修改值的时候，页面不渲染的问题？
+### 259. createElement与cloneElement两者有什么区别？
+### 260. 解释下React中Element 和Component两者的区别是什么？
+### 261. 解释下React中component和pureComponent两者的区别是什么？
+### 262. React的虚拟DOM和vue的虚拟DOM有什么区别？
+### 263. 你觉得React上手快不快？它有哪些限制？
+### 264. 说说你对声明式编程的理解？
+### 265. React与angular、vue有什么区别？
+### 266. React是哪个公司开发的？
+### 267. React是什么？它的主要特点是什么？
+### 268. 简要描述下你知道的React工作原理是什么？
+### 269. 在React中怎样改变组件状态，以及状态改变的过程是什么？
+### 270. 在React中你是怎么进行状态管理的？
