@@ -1621,7 +1621,7 @@ const Demo = () => <H1>demo</H1>
 （React测试方面的知识）
 ### **165. 你有做过React的单元测试吗？如果有，用的是哪些工具？怎么做的？
 (没做过😅)
-### 166. 在React中什么是合成事件？有什么用？
+### **166. 在React中什么是合成事件？有什么用？
 在React中定义的事件，都不是原生的DOM事件，而是由react库内部再次封装的合成事件。
 部分合成事件在表现上与与原生DOM事件存在差异，比如`onChange`事件的实现；
 这样的作用是让react库去抹平事件各个浏览器之间的差异，让开发者用统一的代码，在各个浏览器上实现相同的功能（比如`e.stopPropagation()`，阻止冒泡是由react库内部进行兼容性处理的）
@@ -1740,9 +1740,10 @@ export default function App() {
 ### 169. React的函数式组件有没有生命周期？
 同[第97题](97-函数式组件有没有生命周期？为什么？)
 ### 170. useState和this.state的区别是什么？
-* useState用在函数市场组件中，是React提供的一个Hook，用于管理函数式组件的状态；this.state是class组件中的状态管理
+* useState用在函数式组件中，是React提供的一个Hook，用于管理函数式组件的状态；this.state是class组件中的状态管理
 * this.state的更新使用`this.setState`的方式；useState中状态的更新是useState返回的数组的第二个元素的函数进行更新
 * 获取修改后的值：this.setState可以用第二个参数函数获取，useState可以通过useEffect副作用执行函数获取
+* Hook中的`setXXX`的方式设置值被进行完全的覆盖，而`this.setState`是对`this.state`对象进行浅层的合并
 ### 171. 请说说什么是useImperativeHandle？
 在函数式组件中使用，用于自定义ref的返回值，返回值是一个对象，可以自定义对象的值是函数的内部变量、方法、Node节点等。
 ```jsx
@@ -1976,6 +1977,7 @@ function Demo() {
 React的设计者认为不给用户显示信息，比给用户显示错误的信息要更加的合理，所以采用了这样的一种方案。
 错误边界的使用示例可以查看[第26题](26-React中在哪捕获错误？)
 ### **179. 说说你对Fiber架构的理解
+[这里](https://www.yuque.com/docs/share/73874ed8-2ea7-4c75-bccb-0fb857b45787)
 ### 180. 说说你是怎么理解React的业务组件和技术组件的？
 业务组件即代码逻辑紧贴业务，如ajax请求，一些特定的需求特性等；
 技术组件即使比较通用性的组件，如对loading的处理、ajax的hoc等
@@ -2008,16 +2010,27 @@ class Demo extends React.Component {
 export default Demo;
 ```
 ### 182. 展示组件和容器组件有什么区别？
-展示组件也叫无状态组件，组件组件本身不维护自己的state，接受props进行展示与简单的事件处理;
-容器组件一般是有状态的，也可以接受props，内部包含了各种组件与相关的逻辑;
-### **183. Mern和Yeoman脚手架有什么区别？
-### **184. 你有在项目中使用过Yeoman脚手架吗？
+* 展示组件
+- 无状态组件，组件组件本身不维护自己的state，接受props进行展示与简单的事件处理;
+- 内部可以包含展示组件和容器组件，通常会包含一些自己的DOM标记和样式(style)
+- 对应用程序的其他部分没有依赖关系，例如Reducer操作或store、路由等
+- 不用关心数据是怎么加载和变动的。
+* 容器组件
+- 关注应用的是如何工作的，一般是有状态的，也可以接受props，内部包含了各种组件与相关的逻辑;
+- 内部可以包含容器组件和展示组件，但通常没有任何自己的DOM标记，除了一些包装divs，并且从不具有任何样式
+- 提供数据和行为给其他的展示组件或容器组件
+### 183. Mern和Yeoman脚手架有什么区别？
+* MERN是一种脚手架工具，可使用Mongo，Express，React和Nodejs轻松构建同构应用
+* Yeoman也是脚手架工具，它是基于Node.js运行的，生成的技术栈与开发语言无法，它提供的是文件操作等方法，来自定义生成工程结构与代码文件
+### 184. 你有在项目中使用过Yeoman脚手架吗？
+(没有😭)
 ### **185. 你有在项目中使用过Mern脚手架吗？
+(没有😭)
 ### 186. shouldComponentUpdate方法是做什么的？
 shouldComponentUpdate是React组件的生命周期，在组件更新后触发，该方法继承子React.Component.方法的作用是可以在内部比较更新前后的state和props的值，手动控制当前组件是否需要执行render函数，函数签命是`shouldComponentUpdate(nextProps, nextState)`
 ### 187. 怎样在React中使用innerHTML？
 使用`dangerouslySetInnerHTML`属性,该属性传入一个对象，对象中`__html`属性的值即时innerHTML的富文本代码
-### **188. 你有写过React的中间件插件吗？
+### 188. 你有写过React的中间件插件吗？
 (React中Redux有中间件的概念，没有听过React的中间件，这道题没有理解，这道题和以下的两道题都按照Redux中间件进行回答)
 简单的实现Redux的logger中间件，代码如下:
 ```JavaScript
@@ -2032,7 +2045,8 @@ const logger = store => next => action => {
 export default logger;
 ```
 ### **189. React的中间件机制是怎么样的？这种机制有什么作用？
-### **190. React中你用过哪些第三方的中间件？
+### 190. React中你用过哪些第三方的中间件？
+> 这里理解的是Redux的中间件，React本身好像并没有什么中间件的概念
 * redux-thunk: Redux的异步处理方案,actionCreator中可以返回一个函数（即可以dispatch一个function），函数内在写异步的代码
 * redux-saga: Redux的异步处理方案，没有破坏redux中dispatch一个plain object的原则，内部利用generator的方式实现异步的方式, 同时还提供了watch、put、call等工具方法更好的实现异步的调用
 ### **191. 不用脚手架，你会手动搭建React项目吗？
@@ -2048,7 +2062,7 @@ export default logger;
 ### 194. React多个setState调用的原理是什么？
 同步调用多个setState，React并不会连续多次的进行更新操作，而是会将同步中的多个setState操作合成一个，只执行一次render操作
 ### 195. React中调用setState会更新的生命周期有哪几个？
-(>=16.4之后，于props的更新一致， <16.4的版本没有`static getDerivedStateFromProps`)
+(>=16.4之后，与props的更新一致， <16.4的版本没有`static getDerivedStateFromProps`)
 1. `static getDerivedStateFromProps`
 2. `shouldComponentUpdate`
 3. `render`
@@ -2057,10 +2071,13 @@ export default logger;
 ### 196. React中setState的第二个参数作用是什么呢？
 第二个参数是一个callback函数，用于setState设置state的属性值成功之后的回调，此时调用`this.state.property`可以取到刚刚设置的最新的值
 ### 197. React中的setState是同步还是异步的呢？为什么state并不一定会同步更新？
-setState是异步的，setState之后，取state中的值并不一定是最新更新的值。
-这样设计的原因是可能在同步的代码中可能存在连续的多个setSate操作，react会对他们进行智能的合并，直到执行到了最后一个setState，React才回智能的合并state的，并异步的设置state的值，后续判断是否进行render操作.
+由React控制的事件处理程序，以及生命周期函数调用setState不会同步更新state 。
+React控制之外的事件中调用setState是同步更新的。比如原生js绑定的事件，setTimeout/setInterval等。
+从代码的本质上看它们都是同步的，只是第一种情况是有批处理机制，当跟组件didMount后，再进行统一的合并更新。
+这样设计的原因是可能在同步的代码中可能存在连续的多个setSate操作，react会对他们进行智能的合并，直到执行到了最后一个setState，React才回智能的合并state的，并异步的设置state的值，后续判断是否进行render操作.如果同步的每次setState都去走一遍reconciler & commit操作，则太耗性能了。
+第二种情况中，原生事件没有触发批处理机制，异步代码中，同步代码中的批处理已经执行晚了，没有了flag来标记应当批处理，所以就直接执行了
 ### 198. React中的setState批量更新的过程是什么？
-同步代码中的多个setState执行完成了，react对涉及到的state进行批量的合并，再异步的对state中的属性进行赋值，后续根据shouldComponent的返回值情况决定是否re-render.
+在React控制的事件和生命周期的代码中的多个setState执行完成了，react对涉及到的state进行批量的合并，再异步的对state中的属性进行赋值，后续根据shouldComponent的返回值情况决定是否re-render.
 ### **199. React中的setState执行机制是什么呢？
 只要执行了setState方法，必然会引起组件的更新流程。
 [参考文章](https://juejin.cn/post/6844903781813993486)
