@@ -2533,6 +2533,57 @@ class Demo extends React.Component {
 export default Demo;
 ```
 ### 259. createElement与cloneElement两者有什么区别？
+* `createElement`是创建一个React元素，`jsx`即是这个函数的语法糖；它的函数签命是`React.createElement(type, [props], [...children])`
+* `cloneElement`是拷贝一个React元素，可选择在修改它的props后，再返回一个新的React元素；它的函数签命是`React.cloneElement(element, [props], [...children]): ReactElement`,这个函数常结合`React.Children.map`一起使用，修改`props.children`的props，来进行一些额外的操作，如下
+```jsx
+/** 以下代码实现点击子组件是，先执行父组件的onClick方法，再执行子组件的onClick方法
+ */
+import React from 'react';
+
+function Tab(props) {
+    const _onClick = (onclick) => {
+        props.onClick();
+        onclick();
+    };
+    return <ul onClick={props.onClick}>
+        {
+            React.Children.map(props.children, child => {
+                const childProps = child.props;
+                const newProps = {
+                    ...childProps,
+                    onClick: _onClick.bind(null, childProps.onClick)
+                }
+                return React.cloneElement(child, newProps);
+            })
+        }
+    </ul>
+}
+
+function TabItem(props) {
+    const onClick = event => {
+        event.stopPropagation();
+        props.onClick(event);
+    }
+    return <li onClick={onClick}>{props.children}</li>
+}
+
+function Demo() {
+    const onClickTab = () => {
+        console.log('onClickTab')
+    }
+    const onClickItem = () => {
+        console.log('onClickItem')
+    }
+    return <Tab onClick={onClickTab}>
+        <TabItem onClick={onClickItem}>111</TabItem>
+        <TabItem onClick={onClickItem}>222</TabItem>
+        <TabItem onClick={onClickItem}>333</TabItem>
+    </Tab>
+}
+
+export default Demo;
+```
+
 ### 260. 解释下React中Element 和Component两者的区别是什么？
 ### 261. 解释下React中component和pureComponent两者的区别是什么？
 ### 262. React的虚拟DOM和vue的虚拟DOM有什么区别？
