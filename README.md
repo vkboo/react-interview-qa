@@ -2080,6 +2080,8 @@ React控制之外的事件中调用setState是同步更新的。比如原生js�
 在React控制的事件和生命周期的代码中的多个setState执行完成了，react对涉及到的state进行批量的合并，再异步的对state中的属性进行赋值，后续根据shouldComponent的返回值情况决定是否re-render.
 ### **199. React中的setState执行机制是什么呢？
 只要执行了setState方法，必然会引起组件的更新流程。
+React会将setState的效果放在队列中，积攒着一次引发更新过程
+[【React】setState的执行机制](https://github.com/swiftwind0405/blog/issues/60)
 [参考文章](https://juejin.cn/post/6844903781813993486)
 ### 200. 在React中遍历的方法有哪些？它们有什么区别呢？
 有`React.Children.map`和 `React.Children.forEach`这两个方法，他们的参数都是在组件中接受`props.children`这个ReactNode作为参数，然后进行遍历。专门提供这两个遍历方法的目的是`props.children`可能是字符串、null、数组，用`React.Children.map`可以抹平这些数据类型的差异，使之都能进行循环，并返回合理的值
