@@ -2583,15 +2583,39 @@ function Demo() {
 
 export default Demo;
 ```
-
 ### 260. 解释下React中Element 和Component两者的区别是什么？
+同[第129题](129-在React中组件和元素有什么区别)
 ### 261. 解释下React中component和pureComponent两者的区别是什么？
-### 262. React的虚拟DOM和vue的虚拟DOM有什么区别？
+PureComponent继承自Component,他们的区别体现在state和render的响应上
+* 继承自Component的组件，在父组件render方法执行的条件下，不管props有没有改变，组件的render方法都会执行
+* 继承自PureComponent的组件，父组件render之后，如果组件的props没有改变(引用数据类型浅比较依然与之前的对象相同)，则组件的render方法不会执行
+* 执行`this.setState({})`后，继承自Component的组件的render方法会重新执行，而如果在继承自PureComponent的组件中执行以上代码，因为state对象的各值都没有变化，所以render方法不会执行
+### **262. React的虚拟DOM和vue的虚拟DOM有什么区别？
 ### 263. 你觉得React上手快不快？它有哪些限制？
-### 264. 说说你对声明式编程的理解？
+相对vue来说不快。
+* 限制
+- 需要学习JSX
+- 需要工程化的配置
+- 需要对原生JavaScript有相当的掌握
+### **264. 说说你对声明式编程的理解？
 ### 265. React与angular、vue有什么区别？
+angular不太了解。这里说下React和Vue.js的区别
+* MVVM实现：Vue是采用依赖收集的方式来实现数据到视图的绑定,React使用的是Fiber Tree进行循环更新
+* 事件：Vue使用原生的DOM事件，React使用合成事件，且使用了事件委托到appRoot节点(`<React17`是document节点)
 ### 266. React是哪个公司开发的？
+facebook
 ### 267. React是什么？它的主要特点是什么？
+React是用于构建用户界面的库。
+特点：
+* 组件化
+* 数据到视图的单向绑定
+* 数据的单项传递流
 ### 268. 简要描述下你知道的React工作原理是什么？
+React以组件为基本的工作单位，每个组件都有自己的render方法(函数式组件直接返回)返回一个jsx结构用于描述组件的UI，组件有自己的状态state和从父组件接受的数据props；当state或props发生改变时，会引起React内部开始进行Reconciler（即DOM diff）操作，这个操作会首先检查当前节点的state和props是否改变，来决定是否更新当前节点的状态并执行响应的生命周期函数，并把节点差异存放在effect list（diff结果）中，一个节点检查完了之后会按照从顶向下、兄弟节点间逐级构造的方式进行循环这个操作，这个过程时可暂停的，依靠浏览器的`requestIdelCallback`进行调度；Reconciler完成了之后，这个组件树更新前后的diff结果已经算出来了，接下来就是不可中断commit操作，这个操作会把diff结果应用到真实的DOM上，执行`componentDidMount`或`componentDidUpdate`声明周期，整个更新流程完成。
 ### 269. 在React中怎样改变组件状态，以及状态改变的过程是什么？
+* 使用`this.setState`改变组件的状态
+* 改变的过程中，React Fiber Reconciler遍历了整个Fiber Tree，得到了最新的DOM diff结果，并把这个结果应用到真实的DOM上。同时相应的生命周期(`static getStateFromProps` `shouldComponentupdate` `render` `getSnapshotBeforeUpdate` `componentDidUpdate`)也在相应的时机执行.
 ### 270. 在React中你是怎么进行状态管理的？
+* 使用React原生的Context+useContext
+* 使用`redux` + `react-redux` + `redux-thunk`
+* 使用`mobx` + `mobx-react`
