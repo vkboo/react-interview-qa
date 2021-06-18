@@ -2453,9 +2453,85 @@ export default FormDemo;
 ### 255. 浏览器为什么无法直接JSX？怎么解决呢？
 因为浏览器只能解决原生的JS代码，jsx不属于原生的js，它是类似于html的语法，然后转化成一个js对象。
 这个转化的过程就是通过Babel的`@babel/plugin-transform-react-jsx`插件实现的。
-### 256. 在使用React过程中你都踩过哪些坑？你是怎么填坑的？
+### **256. 在使用React过程中你都踩过哪些坑？你是怎么填坑的？
+* 组件不像Vue一样有(beforeRouteLeave, beforeRouteEnter)路由守卫
+* Hooks中的闭包渲染问题
+```JSX
+import { useState } from 'react';
+
+const Demo = () => {
+    const [count, setCount] = useState(0);
+    const onAdd = () => {
+        setTimeout(() => {
+            // setCount(count + 1);
+            // 解决方案：使用回调的形式，这样setXXX必须强制依赖上一次的求值
+            setCount(prevCount => prevCount + 1);
+        }, 1000);
+    };
+    return <>
+        <h2>{count}</h2>
+        <button onClick={onAdd}>ADD</button>
+    </>
+}
+export default Demo;
+```
 ### 257. 说说你喜欢React的原因是什么？它有什么优缺点？
+* 原因：
+- All in JS，没有过多的语法糖、API等，核心思想就是props、state、生命周期、hooks，使用JS的技能就能解决和解释一切现象
+* 优点：
+- 使用了虚拟DOM，高性能
+- JSX: 类似HTML的语法方便的构建UI
+- MVVM，数据模型可以自动的响应在UI上
+- 活跃的生态圈
+* 缺点:
+- React非框架，不同的开发人员有不同的写法，对开发人员要求较高
 ### 258. 如何解决引用类型在pureComponent下修改值的时候，页面不渲染的问题？
+使用immutable对象
+```jsx
+import React from 'react';
+
+class PComponent extends React.PureComponent {
+    render() {
+        const { name, age } = this.props.person;
+        return <>
+            <p>NAME: {name}</p>
+            <p>AGE: {age}</p>
+        </>
+    }
+}
+
+class Demo extends React.Component {
+    state = {
+        person: {
+            name: 'vk',
+            age: 1,
+        }
+    }
+    doChange = () => {
+        const { person } = this.state;
+        // 这种情况下，person的引用地址没有变化，diff前后浅比较相等，所以并没有引起PComponent变化
+        // 如果PComponent是继承自React.Component,因为父组件的render导致了子组件也render了，是会产生变化的
+        // person.name = 'vk2';
+        // this.setState({ person })
+        // 正确的写法
+        this.setState({
+            person: {
+                ...person,
+                name: 'vk2',
+            }
+        });
+    }
+    render() {
+        const { person } = this.state;
+        return <>
+            <button onClick={this.doChange}>Change</button>
+            <PComponent person={person} />
+        </>
+    }
+}
+
+export default Demo;
+```
 ### 259. createElement与cloneElement两者有什么区别？
 ### 260. 解释下React中Element 和Component两者的区别是什么？
 ### 261. 解释下React中component和pureComponent两者的区别是什么？
