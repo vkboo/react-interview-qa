@@ -2622,13 +2622,60 @@ React以组件为基本的工作单位，每个组件都有自己的render方法
 * 使用`redux` + `react-redux` + `redux-thunk`
 * 使用`mobx` + `mobx-react`s
 ### 271. React声明组件有哪几种方法，各有什么不同？
+1. 用类声明
+* 继承自`React.Component`，实例中挂载了父类的方法和属性如`this.setState`,`this.props`
+* 可以维护自己的state
+* 有生命周期函数
+* 父组件可以通过ref获取用类声明的子组件的实例
+* 必须有render方法，并且需要返回一个`ReactNode`
+2. 函数式声明
+* 默认没有自己的状态，props需要使用函数的参数传入
+* 可以使用hooks
+* 使用`useState`维护自己的状态
+* 没有生命周期，使用`useEffect`模拟组件的声明周期
+* 父组件引用了函数式的子组件，父组件无法获取子组件的实例，如果需要获取子组件的中的DOM节点，使用使用`React.forwardRef`进行转发，如果还想获取子组件中定义的属性/方法，还需要使用`useImperativeHandle`的Hook
+* 函数必须返回一个`ReactNode`作为这个组件的UI描述
 ### 272. React-Router怎么获取历史对象？
+* 类组件：在保证props能获取到路由信息的前提下（如果不是直接嵌套在`<Router/>`下，需要使用`withRouter`的HOC），通过`this.props.history`获取
+* 函数式组件：`const history = useHistory();`
 ### 273. React-Router怎么获取URL的参数？
+* 类组件：在保证props能获取到路由信息的前提下（如果不是直接嵌套在`<Router/>`下，需要使用`withRouter`的HOC），通过`this.props.match.params`获取
+* 函数式组件：`const params = useParams();`
 ### 274. 在history模式中push和replace有什么区别？
+push会向历史栈中增加一个栈，replace是替换当前的栈，历史栈的数量不会增加
 ### 275. React-Router怎么设置重定向？
+* 使用`<Redirect/>`
+```jsx
+import { BrowserRouter, Route, Redirect, Switch } from 'react-router';
+function App () {
+  return (
+    <BrowserRouter>
+      <Switch>
+        <Redirect from="/" to="/home" />
+        <Route path="/home">
+          <ComponentHome>
+        <Route>
+        <Route path="/about">
+          <ComponentAbout>
+        <Route>
+      </Switch>
+    <BrowserRouter>
+  )
+
+}
+```
 ### 276. React-Router 4中`<Router>`组件有几种类型？
+* BrowserRouter：根据浏览器的path进行路由导航
+* HashRouter：根据浏览器的hash进行路由导航
+* MemoryRouter: 导航的依据存储在内存中（用于React Native）
 ### 277. React-Router 3和React-Router 4有什么变化？添加了什么好的特性？
+* 变化
+- React-Router 3用的是配置式路由，v4用的组件式路由，所有的配置都是组件
+* 特性
+- 配置更加灵活 
 ### 278. React-Router的实现原理是什么？
+* HashRouter：根据hash的变化，即利用`window.addEventListener('hashchange', () => {})`进行DOM的显示切换
+* BrowserRouter：根据path的变化，即利用`window.addEventListener('popstate', () => {})`进行DOM的显示切换
 ### 279. React-Router 4的switch有什么用？
 ### 280. React-Router的路由有几种模式？
 ### 281. React-Router 4怎样在路由变化时重新渲染同一个组件？
