@@ -2620,4 +2620,19 @@ React以组件为基本的工作单位，每个组件都有自己的render方法
 ### 270. 在React中你是怎么进行状态管理的？
 * 使用React原生的Context+useContext
 * 使用`redux` + `react-redux` + `redux-thunk`
-* 使用`mobx` + `mobx-react`
+* 使用`mobx` + `mobx-react`s
+### 271. React声明组件有哪几种方法，各有什么不同？
+### 272. React-Router怎么获取历史对象？
+### 273. React-Router怎么获取URL的参数？
+### 274. 在history模式中push和replace有什么区别？
+### 275. React-Router怎么设置重定向？
+### 276. React-Router 4中`<Router>`组件有几种类型？
+### 277. React-Router 3和React-Router 4有什么变化？添加了什么好的特性？
+### 278. React-Router的实现原理是什么？
+### 279. React-Router 4的switch有什么用？
+### 280. React-Router的路由有几种模式？
+### 281. React-Router 4怎样在路由变化时重新渲染同一个组件？
+### 282. React-Router的`<Link>`标签和`<a>`标签有什么区别？
+### 283. React的路由和普通路由有什么区别？
+### 284. 请你说说React的路由的优缺点？
+### 285. 请你说说React的路由是什么？
