@@ -2681,13 +2681,30 @@ function App () {
 ### 280. React-Router的路由有几种模式？
 同[第276题](276-React-Router 4中`<Router>`组件有几种类型？)
 ### 281. React-Router 4怎样在路由变化时重新渲染同一个组件？
-
+在路由变化的时候给需要重新渲染的组件不同的key值
 ### 282. React-Router的`<Link>`标签和`<a>`标签有什么区别？
+* `<Link>`标签是`react-router-dom`下的元素，`<a>`是html原生标签
+* 两者同样都会实现页面的跳转功能，`<Link>`会页面无刷新的跳转，而`<a>`标签进行刷新
+* 出现上面现象的原因`<a>`标签在涉及到path变化后浏览器的原生反应就是会刷新页面，虽然`<Link>`渲染后默认也是a标签,在`<Link>`内部的实现原理是通过`history`进行了跳转，并且`event.preventDefault()`阻止了`a`标签的默认事件
 ### 283. React的路由和普通路由有什么区别？
+* React路由是前端的路由，普通路由指的是后端的路由
+* React路由不管是hash还是browser的模式，都是在响应了hash/browser的change之后，再变更页面的DOM结构，由于是单页应用，页面始终没有变化;普通通过请求的path，然后相应不同的页面
 ### 284. 请你说说React的路由的优缺点？
+优点：
+* 配置灵活
+* 支持丰富的传参
+* 利用hashRouter也可以实现低版本浏览器的兼容
+缺点：
+* BrowserRouter的模式需要服务器配合，保证在前端路由的切换范围内，都只相应同一个html文件
+* BrowserRouter需要现代浏览器才能兼容
 ### 285. 请你说说React的路由是什么？
-### 286. 你有了解Rxjs是什么吗？它是做什么的？
+React的路由是纯前端的路由，就是根据hash或browser path的变化，框架内封装好了方法，可以自由的切换DOM展示，来模拟页面或局部页面被替换的目的；让浏览器不用刷新，也能获取想要的页面结构，保存内存数据，提升用户体验
+### **286. 你有了解Rxjs是什么吗？它是做什么的？
+(😂不了解)
 ### 287. 在Redux中怎么发起网络请求？
+如果单纯的使用Redux，因为redux的actionCreator返回一个plain object，所以不能在actionCreator中发起网络请求；reducer是一个纯函数，不能有副作用，所以也不能有异步的操作；如果需要在Redux中发起网络请求，就要借助中间件；如下：
+* react-thunk: 使用这个中间件后，
+* react-saga: 
 ### 288. Redux怎样重置状态？
 ### 289. Redux怎样设置初始状态？
 ### 290. Context api可以取代Redux吗？为什么？
