@@ -2739,24 +2739,187 @@ export default function configureStore (initialState = []) {
 (😂不了解)
 ### 296. 你有使用过redux-saga中间件吗？它是干什么的？
 有使用过.
-Redux原生不支持异步处理方案，`redux-saga`是Redux生态中异步方案的一种。它是通过
-// 待续
+Redux原生不支持异步处理方案，`redux-saga`是Redux生态中异步方案的一种。
+通过在saga文件中的generator函数内监听相应的type，可以在视图层触发对应的type，以此来触发相应的generator函数，在generator函数中可以触发redux中的reducer，以此来向reducer写入数据。与`redux-thunk`不同的是，使用`redux-saga`并没有改变Redux中dispatch一个plain object的本质，只是将异步的函数封装到了generator中，以此来实现向redux中写入异步逻辑的用法
 ### 297. Redux中异步action和同步action最大的区别是什么？
-### 298. Redux和vuex有什么区别？
-### 299. Redux的中间件是什么？你有用过哪些Redux的中间件？
+* 同步action：执行了dispatch函数之后，对应的reducer纯函数立即得到执行，reducer执行完了之后，state立即就改变了，此时用`store.getState`函数，取到的是最新的state值；
+* 异步action：原则上redux并没有提供异步action的处理方案，异步的action需要依赖第三方的中间件解决（如`redux-thunk`和`redux-saga`），dispatch了一个异步action之后，目标state并不会立即响应，而是要看异步函数内部的逻辑，来决定state什么时候响应.
+### **298. Redux和vuex有什么区别？
+* redux是js中通用的数据流处理方案，与框架甚至是否使用框架无关；vuex只能在Vue.js中使用`
+### **299. Redux的中间件是什么？你有用过哪些Redux的中间件？
+* Redux中间件的最简函数结构如下：
+```jsx
+const middleware = store => next => action => {
+  let result = next(action);
+  return result;
+}
+```
+它是通过改变每次调用时dispatch函数的作用来实现附加的功能
+* 用过的中间件有:
+- `redux-logger`: 用于在控制台记录redux的变化，方便调试
+- `redux-thunk`: redux的异步处理方案，通过在actionCreator中返回一个function，在这个function中来实现异步
+- `redux-saga`: redux的异步处理方案，通过定义saga文件，并在saga文件中的generator函数中调用异步函数
 ### 300. 说说Redux的实现流程
+通过分析redux的几个核心api，来看如何实现redux
+* `store.subscribe`: 订阅数据的变化
+* `store.dispatch`：dispatch后改变state,同时通知`store.subscribe`函数执行，上面这两个函数可以利用发布-订阅模式
+* `store.getState`: 通过这个函数直接返回内存中的state变量即可
+简单的实现如下
+```JavaScript
+export function createStore(reducer, enhancer) {
+
+    if (enhancer && typeof enhancer === 'function') {
+        const newCreateStore = enhancer(createStore);
+        const newStore = newCreateStore(reducer);
+        return newStore;
+    }
+
+    let state;              // state记录所有状态
+    let listeners = [];     // 保存所有注册的回调
+
+    function subscribe(callback) {
+        listeners.push(callback);       // subscribe就是将回调保存下来
+    }
+
+    // dispatch就是将所有的回调拿出来依次执行就行
+    function dispatch(action) {
+        state = reducer(state, action);
+        for (let i = 0; i < listeners.length; i++) {
+            const listener = listeners[i];
+            listener();
+        }
+    }
+
+    // getState直接返回state
+    function getState() {
+        return state;
+    }
+
+    // store包装一下前面的方法直接返回
+    const store = {
+        subscribe,
+        dispatch,
+        getState
+    }
+
+    return store;
+}
+
+export function combineReducers(reducerMap) {
+    const reducerKeys = Object.keys(reducerMap);    // 先把参数里面所有的键值拿出来
+
+    // 返回值是一个普通结构的reducer函数
+    const reducer = (state = {}, action) => {
+        const newState = {};
+
+        for (let i = 0; i < reducerKeys.length; i++) {
+            // reducerMap里面每个键的值都是一个reducer，我们把它拿出来运行下就可以得到对应键新的state值
+            // 然后将所有reducer返回的state按照参数里面的key组装好
+            // 最后再返回组装好的newState就行
+            const key = reducerKeys[i];
+            const currentReducer = reducerMap[key];
+            const prevState = state[key];
+            newState[key] = currentReducer(prevState, action);
+        }
+
+        return newState;
+    };
+
+    return reducer;
+}
+
+// 参数支持多个中间件
+export function applyMiddleware(...middlewares) {
+    function enhancer(createStore) {
+      function newCreateStore(reducer) {
+        const store = createStore(reducer);
+        
+        // 多个middleware，先解构出dispatch => newDispatch的结构
+        const chain = middlewares.map(middleware => middleware(store));
+        const { dispatch } = store;
+        
+        // 用compose得到一个组合了所有newDispatch的函数
+        const newDispatchGen = Redux.compose(...chain);
+        // 执行这个函数得到newDispatch
+        const newDispatch = newDispatchGen(dispatch);
+  
+        return {...store, dispatch: newDispatch}
+      }
+      
+      return newCreateStore;
+    }
+    
+    return enhancer;
+  }
+```
 ### 301. Mobx的设计思想是什么？
+依赖收集。在Mobx中，定义了observable的属性，mobx会自动跟踪这个属性值的变化；在用了mobx与react的桥接库mobx-react之后，这种跟踪关系会体现了视图上，JSX依赖的observable属性值变化，视图就会自动的进行更新
 ### 302. Redux由哪些组件构成？
+(这道题应该本意是Redux由哪些部分组成)
+* State：Redux中的数据
+* Reducer：这是Redux的核心，内部处理接受到action后到返回新的state的逻辑；reducer可以进行嵌套，一个store只有一个根reducer
+* Action：一般会写成actionCreator函数的形式，这个函数返回的就是action对象，这个对象至少会一个type属性，用于标识当前的动作
+* Store: 以上三部分组成的就是一个Store，一般来说一个应用仅存在一个Store，它可以进行读取应用的state，监听state的变化，发起一个action等操作
 ### 303. Mobx和Redux有什么区别？
+* 每一次的dispatch都会从根reducer到子reducer嵌套递归的执行，所以效率相对较低；而Mobx的内部使用的是依赖收集，所以不会有这个问题，执行的代码较少，性能相对更高；
+* Redux核心是不可变对象，在Reducer中的操作都要比较小心，注意不能修改到state的属性，返回时必须是一个全新的对象；而Mobx采用不存在这个问题，操作比较随意；
+* Redux中写法固定，模板代码较多，Mobx中写法比较随意，但是因为写法随意的原因，如果没有规范性的话，维护性则不会像Redux那么高；
+* 正因为Redux中的reducer更新时，每次return的都是不可变对象，所以时间旅行操作相对容易，而Mobx在这方面不占优势
+* Redux更加的轻量，但是一般来说都会配合中间件进行使用
 ### 304. 在React项目中你是如何选择Redux和Mobx的？说说你的理解
+一般来说选择Redux，原因如下：
+* 库更加的成熟、轻量，社区获取，中间件比较多，遇到问题网上几乎都有相似的解决方案
+* 虽然模板代码过多，但是通常都可以解决，例如可以用一个通过的actionCreator的creator函数来生成一系列的actionCreator函数;同时正式因为这个缺点，写法固定，团队开发中，大家的代码风格类似，增加可维护性
+* 单纯看Redux本身似乎用起来很僵化，通常都是结合`dvajs`进行使用，用法简单，理解易懂
 ### 305. 你有在React中使用过Mobx吗？它的运用场景有哪些？
+有用过。
+在项目数据比较多，这些数据是可变的，且各个模块都要公用这部分数据的时候比较实用。（当然，Redux的方案也可以解决）.
+常用的使用方式是定义一个类的`ModuleModel.js`文件，导出这个类的实例，然后在类中定义的@observable的实例属性和@action实例方法，通过`mobx-react`桥接到React组件中，给组件@observer包装，则可以在组件的视图中响应式的获取`ModuleModel.js`中的值。
+通过这种方式，可以把组件的大量的数据分离到`ModuleModel.js`文件中去，使代码更加的直观，同时增加了`ModuleModel.js`文件的可复用性
 ### 306. Redux的thunk作用是什么？
+作用：通过redux-thunk这个中间件，改变了redux中原本dispatch函数的作用，使它可以接受一个function作为dispatch的对象；在使用上，可以在这个function上进行异步操作，这样就实现了异步操作redux的目的.
 ### 307. Redux的数据存储和本地储存有什么区别？
+* Redux存储的数据本质上都是JS变量，都是在内存中的，页面刷新就会消失
+* 本质存储是像`localStorage` `Cookie` `IndexDB` `WebSQL`等缓存技术，它是存储在硬盘中的，不会随便页面刷新而消失
 ### 308. 在Redux中，什么是reducer？它有什么作用？
+* 概念：Reducer是redux的核心，它接受initialState、action作为参数，返回一个下一个state；
+* 作用：Reducer是在dispatch一个action的时候执行，根据reducer内部的代码来判断如何生成新的state，并返回一个全新的state作为dispatch后store的state值
+* 注意：Reducer总是从顶往下执行，即使只是改动了一个很小的子级的reducer，从这个子级reducer往上的各个reducer总是返回一个新的state
 ### 309. 举例说明怎么在Redux中定义action？
+利用actionCreator
+```jsx
+// 用户选择需要显示的subreddit
+export const SELECT_SUBREDDIT = 'SELECT_SUBREDDIT'
+
+export function selectSubreddit(subreddit) {
+    return {
+        type: SELECT_SUBREDDIT,
+        subreddit
+    }
+}
+```
 ### 310. 在Redux中，什么是action？
+action是Redux中定义一个响应的动作，action总是有一个type属性，作为这个动作的唯一标识; Reducer函数则会根据这个`action.type`来如何生成并返回一个新的state
 ### 311. 在Redux中，什么是store？
+Redux中的store是Redux中的存储实例，store有dispatch、subscribe、getState这些核心的api，它们的作用如下
+* dispatch：发起一个动作，用于触发reducer返回新的state
+* subscribe：监听state的变化
+* getState：获取当前的state的值
 ### 312. 为什么Redux能做到局部渲染呢？
+在[第308题](308-在Redux中，什么是reducer？它有什么作用？)中的“注意”中有讲过，reducer从根往最子级的reducer中间各层总是返回一个新的state，这样的话，就会引起组件的大范围的re-render，但是这是可避免的
+* 合理的利用selector：在connect函数中的第一个函数`mapStateToProps`中从store state中返回当前组件需要使用的props，需要一个筛选，这个筛选函数就叫做selector，需要尽量细化传入的store state，即使根state发生了引用的变更，但是它下面的属性值可能是大部分都还是原来的引用，引用了这个老引用的情况下，是不会引起组件的re-render的;正因为如此，因为一般都不会将整个store state组为组件的props进行引用，所以利用这一点就可以实现局部渲染
 ### 313. 说说Redux的优缺点分别是什么？
+* 优点
+* Redux轻量，生态丰富，可以结合流行的`redux-thunk`、`redux-saga`等进行使用
+- Redux的写法比较固定，团队应用中风格比较稳定，提高协作中的可维护性
+- 因为Redux中的reducer更新时，每次return的都是不可变对象，所以时间旅行操作相对容易
+* 缺点
+- 每一次的dispatch都会从根reducer到子reducer嵌套递归的执行，所以效率相对较低；
+- Redux核心是不可变对象，在Reducer中的操作都要比较小心，注意不能修改到state的属性
+- Redux中写法固定，模板代码较多
 ### 314. Redux和Flux的区别是什么？
+* Redux约定一般只能由一个store，flux一般可以使用多个store
 ### 315. Redux它的三个原则是什么？
+* 不可变性
+* Reducer纯函数
+* actionCreator函数中不能由副作用
