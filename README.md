@@ -2925,6 +2925,6 @@ Redux中的store是Redux中的存储实例，store有dispatch、subscribe、getS
 * Reducer纯函数
 ### 316. 什么是单一数据源？
 Redux的store.getState只能得到一个数据源，通常这是一个对象，通常这也是React App中的唯一Redux数据源，这个state对象中的属性值通过combineReducer整合了子Reducer返回的state的值
-### 316. 什么是Redux？说说你对Redux的理解？有哪些运用场景？
+### 317. 什么是Redux？说说你对Redux的理解？有哪些运用场景？
 * Redux是一个数据管理的库，它除了将数据存储在单一数据源中之外，还确定了变更数据、读取数据的方式，以此来明确了数据的来源，方便调试和问题的定位；
 * 一般Redux需要和react-redux结合应用在React应用中，除了React本身的功能之外，在React中的使用中，还需要注意防止不需要的re-render等问题。
