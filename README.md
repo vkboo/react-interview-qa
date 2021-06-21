@@ -2920,6 +2920,9 @@ Redux中的store是Redux中的存储实例，store有dispatch、subscribe、getS
 ### 314. Redux和Flux的区别是什么？
 * Redux约定一般只能由一个store，flux一般可以使用多个store
 ### 315. Redux它的三个原则是什么？
+* 单一数据源
 * 不可变性
 * Reducer纯函数
-* actionCreator函数中不能由副作用
+### 316. 什么是单一数据源？
+
+### 316. 什么是Redux？说说你对Redux的理解？有哪些运用场景？
