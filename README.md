@@ -2677,9 +2677,11 @@ function App () {
 * HashRouter：根据hash的变化，即利用`window.addEventListener('hashchange', () => {})`进行DOM的显示切换
 * BrowserRouter：根据path的变化，即利用`window.addEventListener('popstate', () => {})`进行DOM的显示切换
 ### 279. React-Router 4的switch有什么用？
-
+`Switch`的 子组件只能是`Route`或者`Switch`组件，它的作用是匹配到下面的第一个路由组件，下面的路由组件就不再进行匹配展示了
 ### 280. React-Router的路由有几种模式？
+同[第276题](276-React-Router 4中`<Router>`组件有几种类型？)
 ### 281. React-Router 4怎样在路由变化时重新渲染同一个组件？
+
 ### 282. React-Router的`<Link>`标签和`<a>`标签有什么区别？
 ### 283. React的路由和普通路由有什么区别？
 ### 284. 请你说说React的路由的优缺点？
