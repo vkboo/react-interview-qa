@@ -896,7 +896,7 @@ export default Demo;
 状态即是React中的state，有状态组件就是React组件中有state在维护的组件，在Hooks之前，一般class组件都是有状态组件(如果只用props，也是无状态组件)，Functional组件都是无状态组件
 ### 74. React v15中怎么处理错误边界？
 (过时的API，无需关注，最新的错误边界处理可以参考[第26题](#26-React中在哪捕获错误？)
-### 75. *React Fiber它的目的是解决什么问题？
+### 75. **React Fiber它的目的是解决什么问题？
 React 15 的 StackReconciler 方案由于递归不可中断问题，如果 Diff 时间过长（JS计算时间），会造成页面 UI 的无响应（比如输入框）的表现，vdom 无法应用到 dom 中。
 
 为了解决这个问题，React 16 实现了新的基于 requestIdleCallback 的调度器（因为 requestIdleCallback 兼容性和稳定性问题，自己实现了 polyfill），通过任务优先级的思想，在高优先级任务进入的时候，中断 reconciler。
@@ -976,7 +976,7 @@ class Child extends React.Component {
 
 export default Child;
 ```
-### 80. *如何用React实现滚动动画？
+### 80. **如何用React实现滚动动画？
 1. 监听`window.scroll`事件，在事件回调中监听`document.documentElement.scrollTop`的值`y`
 2. 根据需求，当`y`值到达一定的值时，利用state控制需要动画的目标元素的显隐
 3. 利用`react-transition-group`库控制动画
@@ -1094,7 +1094,7 @@ class组件：state的变化，即`this.setState`，还有props的变化，都�
 在传统的class组件中，UI和逻辑是绑定在一起的，虽然可以通过hoc的方式进行抽离，但是hoc这种方式并不直观，理解成本较大，hook则解决了这一问题，hooks的书写方式，代码简单明了，复用行极强，通过hooks提供的`useState`实现了数据的响应，同时通过`useEffect`，又实现了对各生命周期的模拟，大大加强了hooks的功能性。
 ### 88. React Hooks帮我们解决了哪些问题？
 见[第87题](#87-React为什么要搞一个Hooks？)
-### 89. *使用React的memo和forwardRef包装的组件为什么提示children类型不对？
+### 89. **使用React的memo和forwardRef包装的组件为什么提示children类型不对？
 过去使用Component、FC等类型定义组件时一般不需要我们定义props里children的类型，因为在上述类型里已经帮你默认加上了 { children?: ReactNode } 的定义。但是@types/react的维护者认为这样导致children几乎没有类型约束，组件开发者应该显式地声明children类型。所以对新的API应该都不会自动加上children的定义了，需要开发者手动添加。（[这里](https://github.com/haizlin/fe-interview/issues/844)找的答案，没看懂，说的好像是ts react吧）
 ### 90. 有在项目中使用过Antd吗？说说它的好处
 使用过。
@@ -1279,7 +1279,7 @@ const Demo = () => {
     </>
 }
 ```
-### 116. *React中怎么操作虚拟DOM的Class属性？
+### 116. **React中怎么操作虚拟DOM的Class属性？
 （这道题问的有点奇怪，没看懂）
 ### 117. 为什么属性使用className而不是class呢？
 jsx本质上还是js语句中的一部分，`class`是js的关键字，不能直接使用
@@ -1568,7 +1568,7 @@ React组件的记忆，这里我理解的是避免React的无效渲染。
 * 利用`react-transition-group`库
 ### 153. 为什么建议不要过渡使用Refs？
 在JSX中使用Refs可以引用到真实的DOM，也可以引用到class组件的实例。针对前者，React作为MVVM框架，应当让数据推动UI进行更新，尽量不要操作DOM，破坏代码的一致性；针对后者，组件间的练习应当尽量使用数据（state+props+Context）来进行交互，避免直接调用组件的方法，增加调试与维护成本。
-### 154. *在React使用高阶组件(HOC)有遇到过哪些问题？如何解决？
+### 154. **在React使用高阶组件(HOC)有遇到过哪些问题？如何解决？
 * ref隔断：可以在hoc函数中返回一个`React.forwardRef`函数包裹的组件解决
 ### 155. 在使用React过程中什么时候用高阶组件(HOC)？
 * 组件有公共的逻辑可以进行抽离(如提取`ajax`的逻辑)
@@ -2128,18 +2128,39 @@ render方法的执行不一定会导致DOM的重新渲染，DOM的重新渲染�
 ### 207. React组件间共享数据方法有哪些？
 * props:只能通过父组件传到子组件，可以通过穿函数的props把子组件的数据通过回调函数传回来
 * Context：Context.Provider下的组件可以共享Provider提供的数据，可以通过在Provider中提供操作Provider value的方法，实现在子组件中修改Provider的数据
-### **208. React的状态提升是什么？使用场景有哪些？
+### 208. React的状态提升是什么？使用场景有哪些？
+* 概念：在React应用中，多个组件需要共用一些状态的话，可以把共有的状态通过props提取到共有的父组件中，事件也可以通过props的方式写在共有的父组件中。这样统一了数据来源，逻辑更加清晰
+* 使用场景: 子组件的数据相互耦合，相互依赖，可能还存在相互修改的情况，这种情况下可以把子组件的共有状态和事件都提取到公有的父组件中去.
 ### 209. 简单描述下你有做过哪些React项目？
 XX管理系统：脚手架使用craco，可以避免`create-react-app`需要eject才能自定义webpack配置的问题；数据管理使用了dvajs，它是对Redux-Saga的封装，可以对异步的数据管理进行处理；路由上使用了react-router-dom
 ### 210. 在构造函数中调用super(props)的目的是什么？
-这是ES6的语法。class组件继承自React.Component，super(props)之后，作为子类的组件可以拿到父类的this，使之可以调用父类的属性和方法，如`this.setState``this.props`等等
+这是ES6的语法。class组件继承自React.Component，super(props)之后，有以下几个作用：
+* 初始化props，虽然不进行`super(props)`操作，组件在实例化时react也会对props进行初始化，但是如果向以下的操作，构造函数中的`this.props`是无法读取的
+```jsx
+class Demo extends React.Component {
+  constructor(props) {
+    super();
+    // 上面的super函数没有传参数，下面的log打印undefined
+    console.log(this.props)
+  }
+}
+```
+* 根据ES的语法规则，作为子类的组件可以拿到父类的this，使之可以调用父类的属性和方法，如`this.setState``this.props`等等
 ### 211. 你是如何学习React的？
 看文档，看相关生态文档、看Github项目上相关项目的代码实现、看面试题、实践
-### **212. 从旧版本的React升级到新版本的React有做过吗？有遇到过什么坑？
-(没做过)
+### 212. 从旧版本的React升级到新版本的React有做过吗？有遇到过什么坑？
+以下以React15 -> React16来举例，会进行以下部分的升级(可参考[这里](https://github.com/nanyang24/blog/issues/92))
+* 生命周期
+- componentWillMount替换为componentDidMount
+- componentWillUpdate替换为componentDidUpdate
+- componentWillReceiveProps的替换问题比较多，这个声明周期一般有两个用处，一是根据父组件的props派生当前组件的props，而是根据props的变化，进行一些其它的非修改state的操作
+  - 针对第一点：通过`static getDerivedStateFromProps`代替，但是一般props派生应用中，只有在组件更新的第一次需要设置state的值，但是`static getDerivedStateFromProps`的执行条件是每次props和state的更新都会执行，所以这里需要加一个状态锁，来确定只有第一次props的传入需要派生state
+* ref：需要用`React.createRef`替换之前的ref回调的形式
+* Context API: 用新的语法代替React15的实验性Context API语法
 ### 213. 你用过React版本有哪些？
-只用过React16.8+
-### 214. 有用过React的服务端渲染吗？怎么做的？
+* React16.8+ 
+* React17.0.1
+### **214. 有用过React的服务端渲染吗？怎么做的？
 (没做过)
 ### 215. React的mixins有什么作用？适用于什么场景？
 (老旧API，不需关心，现在已经被HOC和hooks代替了)
@@ -2193,7 +2214,8 @@ const FComponent = () => {
 }
 export default FComponent;
 ```
-### 217. 请描述下事件在React中的处理方式是什么？
+### **217. 请描述下事件在React中的处理方式是什么？
+（具体实现可以参考[这篇文章](https://juejin.cn/post/6955636911214067720)）
 * 合成事件
 * 事件委托
 * React17中事件的变化
@@ -2201,12 +2223,15 @@ export default FComponent;
 * JSX是类HTML的语法，它是嵌在javascript，JSX标签返回的是一个JSX对象
 * HTML当时是无法写在JS中的，所以才有了JSX，因为JSX是嵌入到JavaScript当中的，所以要避免JS保留字的使用，如for要写成forHTML，class需要写成className
 * JSX没有自己的模版语法糖，因为可以用过原生的js表达式操作它，如只需要把表达式写在`{}`中即可，其中也可以写注释
+* JSX中原生标签的事件的声明方式是`on`前缀加大写开头的事件名称的方式，且事件都不是直接绑定在节点上，均是采用事件委托，而且在组件写在之后，事件会自动被清除。HTML不推荐在标签上进行事件的绑定
+* JSX的标签都是驼峰命名，通过大驼峰和小驼峰来区别是React组件还是原生html标签
 ### 219. React的书写规范有哪些？
 * React元素必须使用大驼峰命名的方式
 * 组件尽量命名，方便进行调试
-* JSX尽量用小括号包起来，方便调试
+* JSX尽量用小括号包起来，更加直观，防止换行时出错
 ### 220. create-react-app创建新运用怎么解决卡的问题？
-(没听cra会导致有这个问题)
+(这个问题应该描述的是使用cra脚手架创建项目慢的问题)
+这是因为cra默认使用的国外的npm源，替换为国内的npm源即，如淘宝源`npm config set registry https://registry.npm.taobao.org`
 ### 221. 使用React的方式有哪几种？
 没看懂是什么意思。
 如果是脚手架的选择，目前有CRA、Craco、umijs；
@@ -2219,9 +2244,11 @@ export default FComponent;
 * React-dom.js 与web浏览器DOM相关的API，比如虚拟DOM的挂载，DOM的更新，Portal等
 * babel.js ES6+代码的转义
 ### 224. 你知道Virtual DOM的工作原理吗？
-(Fiber相关)
+* Virtual DOM是什么：虚拟DOM是真实DOM的javascript对象的映射
+* Virtual DOM的工作原理：数据驱动视图更新这个过程中，首先会改变虚拟DOM对象，一个视图的更新周期，首先会简单新的虚拟DOM和旧的虚拟DOM的差异，最后比较处所有的差异，即是更新前后DOM的差异，最后把这个差异应用到真实的DOM上。
+* 为什么Virtual DOM能提高性能: 频繁的更新DOM会引起性能问题，但是因为虚拟DOM是纯js，所以频繁的更新虚拟DOM不会引起性能的问题，一次更新周期之后，根据diff 虚拟DOM的差异，批量的去更新DOM，达到了最新的DOM更新量。所以相对于手动更新DOM提高了性能。
 ### 225. 你阅读过React的源码吗？简要说下它的执行流程
-(没读过)
+(没读过😭)
 ### 226. React中怎样阻止组件渲染？
 * class组件
 - 使用shouldComponentUpdate生命周期，`return false`
@@ -2229,20 +2256,65 @@ export default FComponent;
 * 函数式组件
 - 使用React.memo包裹组件函数，props没有改变就不会执行函数
 - 使用React.memo包裹函数的同时传入比较函数作为第二个参数，`return true`，组件函数就不会执行
+* 通用
+- 在jsx的属性（包括事件）定义中，讲能提取的属性值提到外层，保证其引用地址不会发生改变,如下
+```jsx
+import React from 'react';
+
+class Child extends React.PureComponent {
+    render () {
+        console.log('child render')
+        return <h2 style={this.props.style}>Child</h2>
+    }
+}
+
+// 优化前:每次按钮的点击，都会引起Child组件的rener方法执行
+class Demo extends React.Component {
+    onClick = () => {
+        this.setState({})
+    }
+    render () {
+        return <>
+            <button onClick={this.onClick}>test</button>
+            <Child style={{color: 'red'}} />
+        </>
+    }
+}
+
+// 优化前:按钮的点击不会引起Child组件的rener方法执行
+class Demo extends React.Component {
+    childStyle = {color: 'red'}
+    onClick = () => {
+        this.setState({})
+    }
+    render () {
+        return <>
+            <button onClick={this.onClick}>test</button>
+            <Child style={this.childStyle} />
+        </>
+    }
+}
+
+export default Demo;
+```
 ### 227. React非兄弟组件如何通信？
 * props可以从父组件传入到子组件进行通信
 * props可以从父组件传入一个callback function到子组件，通过参数回调的形式实现子组件传参到父组件（如子组件是受控组件的实现）
 * 利益Context API，可以实现Provider下任意组件之间的通信
+* EventBus：发布订阅模式（这个和React关系不大了），任意组件间都可以通信
 ### 228. React兄弟组件如何通信？
 * 把兄弟组件的数据都放在共有的父组件中，数据通过父组件往下传递，改变数据的方法也作为props通过父组件往下传递
 * 利益Context API，可以实现Provider下任意组件之间的通信
+* EventBus：发布订阅模式（这个和React关系不大了），任意组件间都可以通信
 ### 229. React非父子组件如何通信？
 * 把所有组件的数据都放在共有的顶层组件中，数据通过顶层组件往下传递，改变数据的方法也作为props通过顶层组件往下传递
 * 利益Context API，可以实现Provider下任意组件之间的通信
+* EventBus：发布订阅模式（这个和React关系不大了），任意组件间都可以通信
 ### 230. React父子组件如何通信？
 * props可以从父组件传入到子组件进行通信
 * props可以从父组件传入一个callback function到子组件，通过参数回调的形式实现子组件传参到父组件（如子组件是受控组件的实现）
 * 利益Context API，可以实现Provider下任意组件之间的通信
+* EventBus：发布订阅模式（这个和React关系不大了），任意组件间都可以通信
 ### 231. React组件间的通信有哪些？
 * Props
 * Context
