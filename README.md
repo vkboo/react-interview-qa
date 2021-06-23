@@ -2752,9 +2752,9 @@ React以组件为基本的工作单位，每个组件都有自己的render方法
 * 使用`this.setState`改变组件的状态
 * 改变的过程中，React Fiber Reconciler遍历了整个Fiber Tree，得到了最新的DOM diff结果，并把这个结果应用到真实的DOM上。同时相应的生命周期(`static getStateFromProps` `shouldComponentupdate` `render` `getSnapshotBeforeUpdate` `componentDidUpdate`)也在相应的时机执行.
 ### 270. 在React中你是怎么进行状态管理的？
-* 使用React原生的Context+useContext
+* 使用React原生的Context+useContext(可选的加上`useReducer`)
 * 使用`redux` + `react-redux` + `redux-thunk`
-* 使用`mobx` + `mobx-react`s
+* 使用`mobx` + `mobx-react`
 ### 271. React声明组件有哪几种方法，各有什么不同？
 1. 用类声明
 * 继承自`React.Component`，实例中挂载了父类的方法和属性如`this.setState`,`this.props`
@@ -2845,7 +2845,8 @@ React的路由是纯前端的路由，就是根据hash或browser path的变化�
 * redux包里面的createStore方法的第二个可选参数即可设置state的初始值
 * 在定义从根到子的reducer时，可以通过默认参数的方式定义state的初始值
 ### 290. Context api可以取代Redux吗？为什么？
-不能。Redux是js中数据管理的一套方案，`react-redux`是方便Redux在React中使用而采用的连接方案库，从这点来看Redux和Context api其实关联性并不大。
+可以，但是并不完美。
+利用`Context API`+`useReducer`的方案可以实现简化版的Redux。
 Redux除了能够存储数据之外，它的强大之处还在于数据修改的单一性，清晰的数据流向，依赖不可变性的数据实现时间旅行等等。而这些特点是原生的Context Api所不具备的。
 ### 291. 推荐在reducer中触发Action吗？为什么？
 不推荐。首先reducer应该是一个纯函数，reducer中的代码应该把代码逻辑限定在当前的reducer内，如果触发了action，会触发其它的reducer、甚至再次触发自身，可能引起死循环或者其它的不确定因素，增加调试成本。
