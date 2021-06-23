@@ -2301,6 +2301,7 @@ export default Demo;
 * props可以从父组件传入到子组件进行通信
 * props可以从父组件传入一个callback function到子组件，通过参数回调的形式实现子组件传参到父组件（如子组件是受控组件的实现）
 * 利益Context API，可以实现Provider下任意组件之间的通信
+* ref：通过Ref获取组建的实例，在通过实例拿到组件的属性值或者方法的回调
 * EventBus：发布订阅模式（这个和React关系不大了），任意组件间都可以通信
 ### 228. React兄弟组件如何通信？
 * 把兄弟组件的数据都放在共有的父组件中，数据通过父组件往下传递，改变数据的方法也作为props通过父组件往下传递
@@ -2314,10 +2315,12 @@ export default Demo;
 * props可以从父组件传入到子组件进行通信
 * props可以从父组件传入一个callback function到子组件，通过参数回调的形式实现子组件传参到父组件（如子组件是受控组件的实现）
 * 利益Context API，可以实现Provider下任意组件之间的通信
+* ref：通过Ref获取组建的实例，在通过实例拿到组件的属性值或者方法的回调
 * EventBus：发布订阅模式（这个和React关系不大了），任意组件间都可以通信
 ### 231. React组件间的通信有哪些？
 * Props
 * Context
+* ref：通过Ref获取组建的实例，在通过实例拿到组件的属性值或者方法的回调
 ### 232. 类组件和函数式组件有什么区别？
 * 写法不同，类组件是类是一个构造函数，在react内部需要被实例化；函数式组件是一个普通的函数，不需要被实例化，没有实例
 * 类组件有自己的生命周期，函数式组件只能通过`useEffect`hook实现类生命周期的概念
@@ -2332,9 +2335,11 @@ export default Demo;
 * state是本组件维护的状态，props是从父组件接受而来的数据，他们都是可响应的，即数据的变化(引用类型通过浅比较)可以引用render函数或者函数式组件的重新执行
 * 两种数据都是immutable的，state可以通过setState进行异步的改变，props不可更改
 ### 235. React有几种构建组件的方式？可以写出来吗？
-（没明白这道题的意思）
+（这题说的应该是：创建组件的几种方式？）
+* class组件，组件即是一个class，这个类通过继承`React.Component`或者`React.PureComponent`，并必须复写render方法返回ReactNode节点作为组件的UI描述
+* 函数式组件：组件是一个函数，函数必须return一个ReactNode作为组件的UI描述
 ### 236. React中遍历时为什么不用索引作为唯一的key值？
-key值的目的在Diff DOM的时候根据render前后的唯一key值快速的对树进行比较，保证key值得唯一性，如在进行中间插入或者最顶上插入时，算法会很明显得知道这是一个插入动作，然后让后续得node往后移位，如果是以索引index作为key值，那么在进入上述的操作后，插入后面的元素key值完全变了，算法不能准确的定位到树中node的位置，只能从插入起，后续的全部重新生成，影响性能
+key值的目的在Diff DOM的时候根据render前后的唯一key值快速的对树进行比较，保证key值得唯一性，如在进行中间插入或者最顶上插入时，算法会很明显得知道这是一个插入动作，然后让后续的node往后移位，如果是以索引index作为key值，那么在进入上述的操作后，插入后面的元素key值完全变了，算法不能准确的定位到树中node的位置，只能从插入的位置起，后续的全部重新生成，影响性能
 ### 237. React中的key有什么作用？
 通过开发者给组件制定`key`属性，来告知渲染哪些子元素在不同的渲染下可以保持不变
 `key`属性解决的就是列表在进行一对一比较的过程中，新元素树，从中间或者顶部插入的问题；例如，从顶部插入，那么react一对一的往下比较，那么每次比较都是不相同的，react会重建每一个元素；指定了key值之后，react会按照key值进行比较，react就会知道原有的列表只是往下移动了而已，创建的元素只有顶部的一个
@@ -2347,11 +2352,40 @@ export class CComponent extends React.Component {
         // code 
     }
     render () {
-        <button onClick={this.onSubmit}>submit</button>        
+        return <button onClick={this.onSubmit}>submit</button>        
     }
 }
 ```
 * 在使用的时候进行`bind`绑定
+```jsx
+import React from 'react';
+export class CComponent extends React.Component {
+    onSubmit () {
+        // code 
+        console.log(this)
+    }
+    render () {
+        return <button onClick={this.onSubmit.bind(this)}>submit</button>        
+    }
+}
+
+export default CComponent;
+```
+* 在使用的时候使用箭头函数
+```jsx
+import React from 'react';
+export class CComponent extends React.Component {
+    onSubmit () {
+        // code 
+        console.log(this)
+    }
+    render () {
+        return <button onClick={() => {this.onSubmit()}}>submit</button>        
+    }
+}
+
+export default CComponent;
+```
 ### 239. 在React中页面重新加载时怎样保留数据？
 每次页面加载完成后讲需要保留的数据保存到sessionStorage中，页面重新加载时再从sessionStorage中获取，如果取不到，再用默认值
 ### **240. 请描述下React的事件机制
