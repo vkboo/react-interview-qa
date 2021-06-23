@@ -2467,7 +2467,7 @@ class Child extends React.Component {
 export default Child;
 ```
 ### 245. React中可以在render访问refs吗？为什么？
-不能，render阶段，ref还没有真实的挂载到DOM节点上，至少要在`componentDidMount`阶段进行访问
+不能，render阶段，ref还没有真实的挂载到DOM节点上，至少要在`componentDidMount`阶段进行访问(即fiber中commit的阶段才可以读取ref)
 ### 246. React中refs的作用是什么？有哪些应用场景？
 * 作用
 - 对类组件、DOM节点的引用
@@ -2583,6 +2583,7 @@ export default FormDemo;
 * React的虚拟DOM，就是一个大的组件树，从父组件层到子组件，在render函数中层层堆叠
 * 从react-router v4开始，路由本身也是组件
 * 各个库提供的hoc返回的也是组件，如withRouter、connect
+* React中的基础数据`state` `props`的传递也是以组件为基础
 ### 254. 写React你是用es6还是es5的语法？有什么区别？
 （老旧问题，没有考察的必要性）
 ### 255. 浏览器为什么无法直接JSX？怎么解决呢？
