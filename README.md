@@ -2731,11 +2731,12 @@ PureComponent继承自Component,他们的区别体现在state和render的响应�
 ### 263. 你觉得React上手快不快？它有哪些限制？
 相对vue来说不快。
 * 限制
-- 需要学习JSX
-- 需要工程化的配置
-- 需要对原生JavaScript有相当的掌握
+  - 需要学习JSX
+  - 需要工程化的配置
+  - 需要对原生JavaScript有相当的掌握
+  - react只是一个UI层面的库，像vue内置了动画处理、keep-alive等功能，react则需要去找第三方库解决
 ### **264. 说说你对声明式编程的理解？
-### 265. React与angular、vue有什么区别？
+### **265. React与angular、vue有什么区别？
 angular不太了解。这里说下React和Vue.js的区别
 * MVVM实现：Vue是采用依赖收集的方式来实现数据到视图的绑定,React使用的是Fiber Tree进行循环更新
 * 事件：Vue使用原生的DOM事件，React使用合成事件，且使用了事件委托到appRoot节点(`<React17`是document节点)
@@ -2744,9 +2745,10 @@ facebook
 ### 267. React是什么？它的主要特点是什么？
 React是用于构建用户界面的库。
 特点：
-* 组件化
-* 数据到视图的单向绑定
+* 组件化,增强复用性
+* 数据到视图的单向绑定,更安全
 * 数据的单项传递流
+* 高性能
 ### 268. 简要描述下你知道的React工作原理是什么？
 React以组件为基本的工作单位，每个组件都有自己的render方法(函数式组件直接返回)返回一个jsx结构用于描述组件的UI，组件有自己的状态state和从父组件接受的数据props；当state或props发生改变时，会引起React内部开始进行Reconciler（即DOM diff）操作，这个操作会首先检查当前节点的state和props是否改变，来决定是否更新当前节点的状态并执行响应的生命周期函数，并把节点差异存放在effect list（diff结果）中，一个节点检查完了之后会按照从顶向下、兄弟节点间逐级构造的方式进行循环这个操作，这个过程时可暂停的，依靠浏览器的`requestIdelCallback`进行调度；Reconciler完成了之后，这个组件树更新前后的diff结果已经算出来了，接下来就是不可中断commit操作，这个操作会把diff结果应用到真实的DOM上，执行`componentDidMount`或`componentDidUpdate`声明周期，整个更新流程完成。
 ### 269. 在React中怎样改变组件状态，以及状态改变的过程是什么？
@@ -2771,11 +2773,32 @@ React以组件为基本的工作单位，每个组件都有自己的render方法
 * 父组件引用了函数式的子组件，父组件无法获取子组件的实例，如果需要获取子组件的中的DOM节点，使用使用`React.forwardRef`进行转发，如果还想获取子组件中定义的属性/方法，还需要使用`useImperativeHandle`的Hook
 * 函数必须返回一个`ReactNode`作为这个组件的UI描述
 ### 272. React-Router怎么获取历史对象？
-* 类组件：在保证props能获取到路由信息的前提下（如果不是直接嵌套在`<Router/>`下，需要使用`withRouter`的HOC），通过`this.props.history`获取
+* 类组件：在保证props能获取到路由信息的前提下（如果不是直接嵌套在`<Route/>`下，需要使用`withRouter`的HOC），通过`this.props.history`获取
 * 函数式组件：`const history = useHistory();`
 ### 273. React-Router怎么获取URL的参数？
-* 类组件：在保证props能获取到路由信息的前提下（如果不是直接嵌套在`<Router/>`下，需要使用`withRouter`的HOC），通过`this.props.match.params`获取
-* 函数式组件：`const params = useParams();`
+* 通过params
+  - 类组件：在保证props能获取到路由信息的前提下（如果不是直接嵌套在`<Route/>`下，需要使用`withRouter`的HOC），通过`this.props.match.params`获取
+  - 函数式组件：`const params = useParams();`
+* 通过search,demo如下：
+```jsx
+// query传参
+this.props.history.push({
+    pathname: 'list',
+    search: qs.stringify({
+        a: 123,
+    }),
+})
+// 取值
+import qs from 'qs';
+// 类组件中取值
+const paramStr = this.props.location.search.slice(1);
+qs.parse(paramStr); // {a: '123'}
+// 在函数式组件中取值
+const location = useLocation();
+const paramStr = location.search.slice(1);
+qs.parse(paramStr); // {a: '123'}
+```
+
 ### 274. 在history模式中push和replace有什么区别？
 push会向历史栈中增加一个栈，replace是替换当前的栈，历史栈的数量不会增加
 ### 275. React-Router怎么设置重定向？
@@ -2786,6 +2809,7 @@ function App () {
   return (
     <BrowserRouter>
       <Switch>
+        {/* to是比如指定的属性，from可不指定，标识始终匹配 */}
         <Redirect from="/" to="/home" />
         <Route path="/home">
           <ComponentHome>
@@ -2803,12 +2827,12 @@ function App () {
 * BrowserRouter：根据浏览器的path进行路由导航
 * HashRouter：根据浏览器的hash进行路由导航
 * MemoryRouter: 导航的依据存储在内存中（用于React Native）
-### 277. React-Router 3和React-Router 4有什么变化？添加了什么好的特性？
+### **277. React-Router 3和React-Router 4有什么变化？添加了什么好的特性？
 * 变化
 - React-Router 3用的是配置式路由，v4用的组件式路由，所有的配置都是组件
 * 特性
 - 配置更加灵活 
-### 278. React-Router的实现原理是什么？
+### **278. React-Router的实现原理是什么？
 * HashRouter：根据hash的变化，即利用`window.addEventListener('hashchange', () => {})`进行DOM的显示切换
 * BrowserRouter：根据path的变化，即利用`window.addEventListener('popstate', () => {})`进行DOM的显示切换
 ### 279. React-Router 4的switch有什么用？
@@ -2816,7 +2840,8 @@ function App () {
 ### 280. React-Router的路由有几种模式？
 同[第276题](276-React-Router 4中`<Router>`组件有几种类型？)
 ### 281. React-Router 4怎样在路由变化时重新渲染同一个组件？
-在路由变化的时候给需要重新渲染的组件不同的key值
+* 在组件内监听location的变化，发生变化执行重新渲染的逻辑
+* 在路由变化的时候给需要重新渲染的组件不同的key值
 ### 282. React-Router的`<Link>`标签和`<a>`标签有什么区别？
 * `<Link>`标签是`react-router-dom`下的元素，`<a>`是html原生标签
 * 两者同样都会实现页面的跳转功能，`<Link>`会页面无刷新的跳转，而`<a>`标签进行刷新
