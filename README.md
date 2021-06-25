@@ -2839,7 +2839,7 @@ function App () {
 `Switch`的 子组件只能是`Route`或者`Switch`组件，它的作用是匹配到下面的第一个路由组件，下面的路由组件就不再进行匹配展示了
 ### 280. React-Router的路由有几种模式？
 同[第276题](276-React-Router 4中`<Router>`组件有几种类型？)
-### 281. React-Router 4怎样在路由变化时重新渲染同一个组件？
+### 281. **React-Router 4怎样在路由变化时重新渲染同一个组件？
 * 在组件内监听location的变化，发生变化执行重新渲染的逻辑
 * 在路由变化的时候给需要重新渲染的组件不同的key值
 ### 282. React-Router的`<Link>`标签和`<a>`标签有什么区别？
@@ -2848,13 +2848,15 @@ function App () {
 * 出现上面现象的原因`<a>`标签在涉及到path变化后浏览器的原生反应就是会刷新页面，虽然`<Link>`渲染后默认也是a标签,在`<Link>`内部的实现原理是通过`history`进行了跳转，并且`event.preventDefault()`阻止了`a`标签的默认事件
 ### 283. React的路由和普通路由有什么区别？
 * React路由是前端的路由，普通路由指的是后端的路由
-* React路由不管是hash还是browser的模式，都是在响应了hash/browser的change之后，再变更页面的DOM结构，由于是单页应用，页面始终没有变化;普通通过请求的path，然后相应不同的页面
+* React路由不管是hash还是browser的模式，都是在响应了hash/browser的change之后，再变更页面的DOM结构，由于是单页应用，页面文件始终没有变化;通过请求的path，然后相应不同的页面
 ### 284. 请你说说React的路由的优缺点？
 优点：
 * 配置灵活
 * 支持丰富的传参
 * 利用hashRouter也可以实现低版本浏览器的兼容
 缺点：
+* v4之后使用url query的方式传参比较繁琐，解析时需要使用queryString和location.search
+* 利用react-router的query或state进行传参打开新的路由，刷新页面后数据会丢失
 * BrowserRouter的模式需要服务器配合，保证在前端路由的切换范围内，都只相应同一个html文件
 * BrowserRouter需要现代浏览器才能兼容
 ### 285. 请你说说React的路由是什么？
@@ -2863,6 +2865,7 @@ React的路由是纯前端的路由，就是根据hash或browser path的变化�
 (😂不了解)
 ### 287. 在Redux中怎么发起网络请求？
 如果单纯的使用Redux，因为redux的actionCreator返回一个plain object，所以不能在actionCreator中发起网络请求；reducer是一个纯函数，不能有副作用，所以也不能有异步的操作；如果需要在Redux中发起网络请求，就要借助中间件；如下：
+
 * react-thunk: 这个中间件可以处理`dispatch`一个`function`,即可以在actionCreator中返回一个函数签命是`(dispatch, getState) => {}`的函数，在这个函数中可以进行异步操作，然后再异步操作后进行dispatch一个action
 * react-saga: reducer、actionCreator都保持原始的模式不改变（`dispatch`的依然是一个plain object），网络请求需要放在saga文件定义的generator函数中，使用`take`或`takeEvery`接受到view层传来的带有`type`的对象，然后执行相应的generator函数，在generator函数中的异步任务执行完成之后，一般是通过`put`方法（雷同于`dispatch`）去更新Store中的数据
 ### 288. Redux怎样重置状态？
