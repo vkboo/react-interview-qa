@@ -2880,7 +2880,7 @@ Redux除了能够存储数据之外，它的强大之处还在于数据修改的
 ### 291. 推荐在reducer中触发Action吗？为什么？
 不推荐。首先reducer应该是一个纯函数，reducer中的代码应该把代码逻辑限定在当前的reducer内，如果触发了action，会触发其它的reducer、甚至再次触发自身，可能引起死循环或者其它的不确定因素，增加调试成本。
 ### 292. Redux怎么添加新的中间件？
-`redux`中`createStore`的第三个参数可以接受一个`enhancer`，`redux`中的`applyMiddleware`一个一个的middleware作为参数，返回值是一个`enhancer`,所以使用方法就是把`middleware`传给`applyMiddleware`函数执行，函数的返回值放入createStore的第三个参数中
+`redux`中`createStore`的第三个参数可以接受一个`enhancer`，`redux`中的`applyMiddleware`返回一个的middleware作为参数，返回值是一个`enhancer`,所以使用方法就是把`middleware`传给`applyMiddleware`函数执行，函数的返回值放入createStore的第三个参数中
 ```jsx
 import { createStore, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
@@ -2907,9 +2907,11 @@ Redux原生不支持异步处理方案，`redux-saga`是Redux生态中异步方�
 通过在saga文件中的generator函数内监听相应的type，可以在视图层触发对应的type，以此来触发相应的generator函数，在generator函数中可以触发redux中的reducer，以此来向reducer写入数据。与`redux-thunk`不同的是，使用`redux-saga`并没有改变Redux中dispatch一个plain object的本质，只是将异步的函数封装到了generator中，以此来实现向redux中写入异步逻辑的用法
 ### 297. Redux中异步action和同步action最大的区别是什么？
 * 同步action：执行了dispatch函数之后，对应的reducer纯函数立即得到执行，reducer执行完了之后，state立即就改变了，此时用`store.getState`函数，取到的是最新的state值；
-* 异步action：原则上redux并没有提供异步action的处理方案，异步的action需要依赖第三方的中间件解决（如`redux-thunk`和`redux-saga`），dispatch了一个异步action之后，目标state并不会立即响应，而是要看异步函数内部的逻辑，来决定state什么时候响应.
-### **298. Redux和vuex有什么区别？
-* redux是js中通用的数据流处理方案，与框架甚至是否使用框架无关；vuex只能在Vue.js中使用`
+* 异步action：原则上redux并没有提供异步action的处理方案，异步的action需要依赖第三方的中间件解决（如`redux-thunk`），dispatch了一个异步action（本质上是dispatch的一个函数）之后，目标state并不会立即响应，而是要看异步函数内部的逻辑，来决定state什么时候响应.
+### 298. **Redux和vuex有什么区别？
+* redux是js中通用的数据流处理方案，与框架甚至是否使用框架无关；vuex只能在Vue.js中使用
+* Redux的state数据是immutable的，reducer的处理，需要返回一个全新引用的state；而在vuex的mutations中可以直接在state的基础上进行改动
+* 异步的处理方式不同：Redux原生不支持异步，需要中间件来支持；vuex原生通过actions支持异步处理
 ### **299. Redux的中间件是什么？你有用过哪些Redux的中间件？
 * Redux中间件的最简函数结构如下：
 ```jsx
@@ -3020,12 +3022,13 @@ export function applyMiddleware(...middlewares) {
 依赖收集。在Mobx中，定义了observable的属性，mobx会自动跟踪这个属性值的变化；在用了mobx与react的桥接库mobx-react之后，这种跟踪关系会体现了视图上，JSX依赖的observable属性值变化，视图就会自动的进行更新
 ### 302. Redux由哪些组件构成？
 (这道题应该本意是Redux由哪些部分组成)
+
 * State：Redux中的数据
 * Reducer：这是Redux的核心，内部处理接受到action后到返回新的state的逻辑；reducer可以进行嵌套，一个store只有一个根reducer
 * Action：一般会写成actionCreator函数的形式，这个函数返回的就是action对象，这个对象至少会一个type属性，用于标识当前的动作
 * Store: 以上三部分组成的就是一个Store，一般来说一个应用仅存在一个Store，它可以进行读取应用的state，监听state的变化，发起一个action等操作
 ### 303. Mobx和Redux有什么区别？
-* 每一次的dispatch都会从根reducer到子reducer嵌套递归的执行，所以效率相对较低；而Mobx的内部使用的是依赖收集，所以不会有这个问题，执行的代码较少，性能相对更高；
+* Redux每一次的dispatch都会从根reducer到子reducer嵌套递归的执行，所以效率相对较低；而Mobx的内部使用的是依赖收集，所以不会有这个问题，执行的代码较少，性能相对更高；
 * Redux核心是不可变对象，在Reducer中的操作都要比较小心，注意不能修改到state的属性，返回时必须是一个全新的对象；而Mobx采用不存在这个问题，操作比较随意；
 * Redux中写法固定，模板代码较多，Mobx中写法比较随意，但是因为写法随意的原因，如果没有规范性的话，维护性则不会像Redux那么高；
 * 正因为Redux中的reducer更新时，每次return的都是不可变对象，所以时间旅行操作相对容易，而Mobx在这方面不占优势
@@ -3084,9 +3087,9 @@ Redux中的store是Redux中的存储实例，store有dispatch、subscribe、getS
 ### 314. Redux和Flux的区别是什么？
 * Redux约定一般只能由一个store，flux一般可以使用多个store
 ### 315. Redux它的三个原则是什么？
-* 单一数据源
-* 不可变性
-* Reducer纯函数
+* 单一数据源: 整个应用的只有一个store，store的state存在于唯一的object tree上
+* state只读：state不可操作，要修改state，需要触发action，让reducer函数中返回一个全新引用的state
+* reducer纯函数：reducer是用来描述action如何改变state的函数，它必须是一个纯函数
 ### 316. 什么是单一数据源？
 Redux的store.getState只能得到一个数据源，通常这是一个对象，通常这也是React App中的唯一Redux数据源，这个state对象中的属性值通过combineReducer整合了子Reducer返回的state的值
 ### 317. 什么是Redux？说说你对Redux的理解？有哪些运用场景？
